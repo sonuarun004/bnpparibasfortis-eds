@@ -11,6 +11,17 @@
       "aemSiteName": "eds-xwalk",
       "aemSiteTitle": "EDS Demo Site",
       "botProtected": true
+    },
+    "bnpparibasfortis-eds": {
+      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json",
+      "previewOrg": "sonuarun004",
+      "previewSite": "bnpparibasfortis-eds",
+      "contentHostUrl": "author-p9652-e115365.adobeaemcloud.com",
+      "aemSitePath": "/content/bnpparibasfortis",
+      "aemAssetsFolderPath": "/content/dam/bnpparibasfortis",
+      "aemSiteName": "bnpparibasfortis",
+      "aemSiteTitle": "BNP Paribas Fortis",
+      "botProtected": true
     }
   }
 }

@@ -1,0 +1,29 @@
+{
+  "status": "success",
+  "url": "https://www.bnpparibasfortis.be/nl/public/over-ons/wie-zijn-we/ons-engagement/sponsoring",
+  "path": "language-masters/nl/over-ons/wie-zijn-we/ons-engagement/sponsoring",
+  "timestamp": "2026-09-20T19:31:14.374Z",
+  "title": "Sponsoring: partnerships en initiatieven van BNP Paribas Fortis",
+  "template": "ons-engagement",
+  "blocks": [
+    "columns-feature",
+    "columns-feature",
+    "columns-feature",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "cards-partner",
+    "accordion-faq",
+    "accordion-faq",
+    "accordion-faq",
+    "accordion-faq"
+  ]
+}

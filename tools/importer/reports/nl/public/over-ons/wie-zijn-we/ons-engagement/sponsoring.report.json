@@ -1,29 +1,8 @@
 {
-  "status": "success",
+  "status": "failed",
   "url": "https://www.bnpparibasfortis.be/nl/public/over-ons/wie-zijn-we/ons-engagement/sponsoring",
   "path": "nl/public/over-ons/wie-zijn-we/ons-engagement/sponsoring",
-  "timestamp": "2026-09-09T17:00:32.567Z",
-  "title": "Sponsoring: partnerships en initiatieven van BNP Paribas Fortis",
-  "template": "ons-engagement",
-  "blocks": [
-    "columns-feature",
-    "columns-feature",
-    "columns-feature",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "cards-partner",
-    "accordion-faq",
-    "accordion-faq",
-    "accordion-faq",
-    "accordion-faq"
-  ]
+  "timestamp": "2026-09-20T19:30:23.253Z",
+  "error": "page.evaluate: Error: WebImporter not available. helix-importer script failed to load.\n    at eval (eval at evaluate (:290:30), <anonymous>:3:15)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+  "errorStack": "page.evaluate: Error: WebImporter not available. helix-importer script failed to load.\n    at eval (eval at evaluate (:290:30), <anonymous>:3:15)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at processUrl (/home/node/.excat-marketplaces/excat-marketplace/excat/skills/excat-content-import/scripts/run-bulk-import.js:691:31)\n    at async main (/home/node/.excat-marketplaces/excat-marketplace/excat/skills/excat-content-import/scripts/run-bulk-import.js:954:22)"
 }
