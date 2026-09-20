@@ -1,5 +1,5 @@
 mountpoints:
   /:
-    url: "https://author-p9652-e1255650.adobeaemcloud.com/bin/franklin.delivery/sonuarun004/eds-site/main"
+    url: "https://author-p9652-e115365.adobeaemcloud.com/bin/franklin.delivery/sonuarun004/bnpparibasfortis-eds/main"
     type: "markup"
     suffix: ".html"
