@@ -244,8 +244,9 @@ var CustomImportScript = (() => {
       WebImporter.rules.createMetadata(main, document);
       WebImporter.rules.transformBackgroundImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
-      const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
-      const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);
+      const MSM_TARGET = "be/nl";
+      const relPath = "over-ons/wie-zijn-we/ons-engagement/sponsoring";
+      const path = WebImporter.FileUtils.sanitizePath(`/${MSM_TARGET}/${relPath}`);
       return [{
         element: main,
         path,

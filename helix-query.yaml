@@ -6,6 +6,7 @@ indices:
       - '/**'
     exclude:
       - '/**.json'
+      - '/language-masters/**'
     target: /query-index.json
     properties:
       lastModified:

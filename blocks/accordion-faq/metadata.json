@@ -6,5 +6,14 @@
   "contentPattern": "One row per Q&A item; each row has 2 cells (question/summary cell and answer/body cell).",
   "usage": "Frequently asked questions or any expandable question/answer content requiring toggle interaction.",
   "options": [],
-  "memberVariantIds": ["accordion-faq"]
+  "memberVariantIds": [
+    "accordion-faq"
+  ],
+  "usageTracking": {
+    "pagesUsing": [
+      "/nl/public/over-ons/wie-zijn-we/ons-engagement/sponsoring"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-20T18:38:52.367Z"
+  }
 }

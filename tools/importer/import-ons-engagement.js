@@ -143,11 +143,13 @@ export default {
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
-    // 6. Generate sanitized path (root URL maps to /index)
-    const rawPath = new URL(params.originalURL).pathname
-      .replace(/\/$/, '')
-      .replace(/\.html?$/, '');
-    const path = WebImporter.FileUtils.sanitizePath(rawPath === '' ? '/index' : rawPath);
+    // 6. MSM tree. The Dutch sponsoring page is authored in the NL language
+    // master (source of truth); the Belgium NL country site (Live Copy of
+    // language-masters/nl) is seeded from it. The importer emits one path per
+    // run — set MSM_TARGET below to produce each delivery path in turn.
+    const MSM_TARGET = 'be/nl'; // or 'language-masters/nl'
+    const relPath = 'over-ons/wie-zijn-we/ons-engagement/sponsoring';
+    const path = WebImporter.FileUtils.sanitizePath(`/${MSM_TARGET}/${relPath}`);
 
     return [{
       element: main,
