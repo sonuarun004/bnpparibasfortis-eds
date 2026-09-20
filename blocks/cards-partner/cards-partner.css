@@ -1,0 +1,92 @@
+/*
+ * cards-partner — partnership cards (image + title + description)
+ * Design migrated from bnpparibasfortis.be (.multi-pp-block).
+ *
+ * The content is authored as several consecutive single-card blocks; the block
+ * JS consolidates them into the first block's <ul>, so the grid lives on that
+ * one list and inherits the section's centered max-width container.
+ */
+
+/* ---- grid: responsive columns (mobile-first, 1-up) ---- */
+.cards-partner > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* ---- card shell (equal height via grid stretch + full-height flex) ---- */
+.cards-partner > ul > li {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: rgb(255 255 255);
+  border: 1px solid rgb(229 229 229);
+  border-radius: 8px;
+  padding: 24px;
+  color: rgb(51 51 51);
+}
+
+/* ---- image (top of card, 3:2) ---- */
+.cards-partner .cards-partner-card-image {
+  line-height: 0;
+  margin-bottom: 24px;
+}
+
+.cards-partner .cards-partner-card-image p {
+  margin: 0;
+  line-height: 0;
+}
+
+.cards-partner > ul > li img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- title ---- */
+.cards-partner .cards-partner-card-body h3 {
+  margin: 0 0 16px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid rgb(229 229 229);
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+  color: rgb(51 51 51);
+}
+
+/* ---- description ---- */
+.cards-partner .cards-partner-card-body p {
+  margin: 0 0 24px;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: rgb(51 51 51);
+}
+
+.cards-partner .cards-partner-card-body p:last-child {
+  margin-bottom: 0;
+}
+
+.cards-partner .cards-partner-card-body a {
+  color: rgb(0 150 94);
+}
+
+/* ---- tablet: 2-up ---- */
+@media (width >= 600px) {
+  .cards-partner > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---- desktop: 3-up (matches source col-sm-4) ---- */
+@media (width >= 900px) {
+  .cards-partner > ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,138 @@
+/* BNP Paribas Fortis footer — link columns, legal/cardstop band, copyright.
+   Mobile-first: base styles are mobile; min-width media queries enhance. */
+
+footer {
+  background-color: #fff;
+  border-top: 1px solid var(--border-color);
+  font-size: var(--body-font-size-xs);
+  color: var(--text-color);
+}
+
+footer .footer-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 40px 16px 24px;
+}
+
+footer p {
+  margin: 0;
+}
+
+footer a {
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: var(--link-color);
+}
+
+footer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- link columns (stacked on mobile) ---- */
+footer .footer-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+footer .footer-col-heading {
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+footer .footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+footer .footer-col a {
+  font-size: 14px;
+}
+
+/* ---- legal band ---- */
+footer .footer-legal {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+footer .footer-cardstop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+footer .footer-cardstop img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
+footer .footer-cardstop p:last-child {
+  font-size: 14px;
+}
+
+footer .footer-cardstop a {
+  color: var(--link-color);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+footer .footer-legal-links ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+footer .footer-legal-links a {
+  font-size: 13px;
+}
+
+/* ---- copyright ---- */
+footer .footer-copyright {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+/* ---- tablet / desktop ---- */
+@media (width >= 900px) {
+  footer .footer-inner {
+    padding: 40px 32px 24px;
+  }
+
+  footer .footer-columns {
+    flex-direction: row;
+    gap: 48px;
+  }
+
+  footer .footer-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  footer .footer-cardstop {
+    margin-bottom: 0;
+  }
+
+  footer .footer-legal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  footer .footer-legal-links ul {
+    justify-content: flex-end;
+  }
+}

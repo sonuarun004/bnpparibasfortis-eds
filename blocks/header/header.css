@@ -1,0 +1,443 @@
+/* BNP Paribas Fortis header — utility bar + main nav with click megamenus.
+   Mobile-first: base styles are mobile; min-width media queries enhance. */
+
+/* stylelint-disable no-descending-specificity */
+
+/* the boilerplate sets a fixed header height; this header is content-sized */
+header.header-wrapper,
+header {
+  height: auto;
+}
+
+header .nav-wrapper {
+  background-color: #fff;
+  width: 100%;
+  z-index: 3;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+header .nav p {
+  margin: 0;
+}
+
+header .nav {
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 16px;
+  font-family: var(--body-font-family);
+}
+
+header .nav a {
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+header .nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- utility bar ---- */
+header .nav-utility {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+}
+
+header .nav-utility-left,
+header .nav-utility-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+header .nav-brand p {
+  margin: 0;
+  line-height: 0;
+}
+
+header .nav-brand img {
+  width: 132px;
+  height: auto;
+}
+
+header .nav-audience li,
+header .nav-utility-tools li,
+header .nav-lang li {
+  display: inline-flex;
+  align-items: center;
+}
+
+header .nav-audience {
+  display: none;
+  gap: 20px;
+}
+
+header .nav-audience a {
+  font-size: 14px;
+}
+
+header .nav-audience a:hover {
+  color: var(--link-color);
+}
+
+header .nav-utility-tools {
+  display: none;
+  gap: 20px;
+}
+
+header .nav-utility-tools a {
+  font-size: 14px;
+  color: var(--link-color);
+}
+
+/* language dropdown */
+header .nav-lang {
+  display: none;
+  position: relative;
+}
+
+header .nav-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+header .nav-lang-toggle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+header .nav-lang-toggle[aria-expanded="true"]::after {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+header .nav-lang-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 72px;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  z-index: 5;
+}
+
+header .nav-lang-menu[hidden] {
+  display: none;
+}
+
+header .nav-lang-menu a {
+  display: block;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+header .nav-lang-menu a:hover {
+  color: var(--link-color);
+  background: rgb(0 150 94 / 8%);
+}
+
+/* search icon */
+header .nav-search {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--link-color);
+}
+
+header .nav-search:hover {
+  color: var(--link-hover-color);
+}
+
+/* ---- hamburger (mobile only) ---- */
+header .nav-hamburger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+header .nav-hamburger-icon,
+header .nav-hamburger-icon::before,
+header .nav-hamburger-icon::after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-color);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+header .nav-hamburger-icon::before {
+  transform: translateY(-7px);
+}
+
+header .nav-hamburger-icon::after {
+  transform: translateY(5px);
+}
+
+header .nav-hamburger[aria-expanded="true"] .nav-hamburger-icon {
+  background: transparent;
+}
+
+header .nav-hamburger[aria-expanded="true"] .nav-hamburger-icon::before {
+  transform: translateY(0) rotate(45deg);
+}
+
+header .nav-hamburger[aria-expanded="true"] .nav-hamburger-icon::after {
+  transform: translateY(-2px) rotate(-45deg);
+}
+
+/* ---- main nav (collapsed on mobile) ---- */
+header .nav-main {
+  display: none;
+  flex-direction: column;
+  padding: 8px 0 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+header .nav-main.nav-main-open {
+  display: flex;
+
+  /* full-width flush drawer: cancel the .nav container's 16px side padding so
+     items span the viewport edge-to-edge (text inset comes from link padding) */
+  margin: 0 -16px;
+  padding: 8px 0 16px;
+}
+
+header .nav-menu-list,
+header .nav-cta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+header .nav-menu-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+header .nav-menu,
+header .nav-link {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+header .nav-link:hover,
+header .nav-menu:hover {
+  color: var(--link-color);
+}
+
+/* megamenu panel (stacked accordion on mobile) */
+header .nav-panel[hidden] {
+  display: none;
+}
+
+header .nav-panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0 12px 12px;
+}
+
+header .nav-col-heading {
+  margin: 8px 0 4px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+header .nav-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+header .nav-col a {
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+header .nav-col a:hover {
+  color: var(--link-color);
+}
+
+/* CTAs */
+header .nav-cta-list {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+header .nav-cta {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+header .nav-cta-outline {
+  border: 1px solid var(--link-color);
+  color: var(--link-color);
+}
+
+header .nav-cta-primary {
+  background: var(--link-color);
+  color: #fff;
+}
+
+header .nav-cta-primary:hover {
+  background: var(--link-hover-color);
+}
+
+header .nav-cta-outline:hover {
+  background: rgb(0 150 94 / 8%);
+}
+
+/* ---- tablet / desktop ---- */
+@media (width >= 900px) {
+  header .nav {
+    padding: 0 32px;
+  }
+
+  header .nav-audience,
+  header .nav-utility-tools,
+  header .nav-lang,
+  header .nav-search {
+    display: flex;
+  }
+
+  header .nav-brand img {
+    width: 164px;
+  }
+
+  header .nav-hamburger {
+    display: none;
+  }
+
+  /* main nav becomes a horizontal bar; it is the positioning context for the
+     dropdown panels so they center on the nav (≈ viewport), not on the button */
+  header .nav-main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    border-top: 1px solid var(--border-color);
+    min-height: 60px;
+    position: relative;
+  }
+
+  header .nav-menu-list {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  header .nav-menu-item {
+    border-bottom: 0;
+  }
+
+  header .nav-menu,
+  header .nav-link {
+    width: auto;
+    padding: 18px 12px;
+    font-size: 15px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  header .nav-menu[aria-haspopup="true"]::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 8px;
+    border-right: 2px solid currentcolor;
+    border-bottom: 2px solid currentcolor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+
+  header .nav-menu[aria-expanded="true"] {
+    color: var(--link-color);
+  }
+
+  header .nav-menu[aria-expanded="true"]::after {
+    transform: translateY(1px) rotate(-135deg);
+  }
+
+  /* full-width dropdown panel below the nav bar */
+  header .nav-panel {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    max-width: 100vw;
+    background: #fff;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 8%);
+    z-index: 4;
+  }
+
+  header .nav-panel-inner {
+    flex-direction: row;
+    gap: 48px;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  header .nav-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  header .nav-cta-list {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0;
+  }
+}

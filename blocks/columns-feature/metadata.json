@@ -1,0 +1,10 @@
+{
+  "variantName": "columns-feature",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Alternating image/text feature rows; image on one side paired side-by-side with a heading and paragraph on the other. Consecutive rows swap the image left/right. Stacks vertically on mobile.",
+  "contentPattern": "One row per feature; each row has 2 cells (image cell and text cell). Rows alternate image/text order to reflect the left/right layout.",
+  "usage": "Narrative feature sections that pair an image with descriptive copy, as opposed to repeatable uniform card items.",
+  "options": [],
+  "memberVariantIds": ["columns-feature"]
+}

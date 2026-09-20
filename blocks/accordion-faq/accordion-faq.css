@@ -1,0 +1,77 @@
+/*
+ * Accordion FAQ block
+ * Visual design migrated from BNP Paribas Fortis (source .accordion-item):
+ * white rounded cards, 1px rgb(183,183,183) border, left green chevron,
+ * dark question text, indented answer body.
+ */
+
+.accordion-faq .accordion-faq-item {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color-strong);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.accordion-faq .accordion-faq-item:last-child {
+  margin-bottom: 0;
+}
+
+/* summary / question row */
+.accordion-faq .accordion-faq-item-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 24px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-color);
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 27px;
+}
+
+.accordion-faq .accordion-faq-item-label::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-faq .accordion-faq-item-label p {
+  margin: 0;
+  font: inherit;
+}
+
+/* left green chevron (no icon font available on source — drawn in CSS) */
+.accordion-faq .accordion-faq-item-label::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-right: 2px solid var(--link-color);
+  border-bottom: 2px solid var(--link-color);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.accordion-faq .accordion-faq-item[open] .accordion-faq-item-label::before {
+  margin-top: 11px;
+  transform: rotate(225deg);
+}
+
+/* answer body */
+.accordion-faq .accordion-faq-item-body {
+  padding: 0 24px 16px 44px;
+  color: var(--text-color);
+}
+
+.accordion-faq .accordion-faq-item-body p {
+  margin: 0;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-color);
+}
+
+.accordion-faq .accordion-faq-item-body p + p {
+  margin-top: 16px;
+}

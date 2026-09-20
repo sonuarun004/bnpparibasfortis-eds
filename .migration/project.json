@@ -1,0 +1,16 @@
+{
+  "type": "xwalk",
+  "sites": {
+    "eds-site": {
+      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json",
+      "previewOrg": "sonuarun004",
+      "previewSite": "eds-site",
+      "contentHostUrl": "author-p9652-e1255650.adobeaemcloud.com",
+      "aemSitePath": "/content/eds-xwalk",
+      "aemAssetsFolderPath": "/content/dam/eds-xwalk",
+      "aemSiteName": "eds-xwalk",
+      "aemSiteTitle": "EDS Demo Site",
+      "botProtected": true
+    }
+  }
+}

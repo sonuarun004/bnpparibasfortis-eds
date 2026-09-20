@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "projectType": "xwalk"
+  },
+  "templates": [
+    {
+      "name": "ons-engagement",
+      "urls": [
+        "https://www.bnpparibasfortis.be/nl/public/over-ons/wie-zijn-we/ons-engagement/sponsoring"
+      ],
+      "representativeUrl": "https://www.bnpparibasfortis.be/nl/public/over-ons/wie-zijn-we/ons-engagement/sponsoring",
+      "description": "Sponsoring / engagement page: intro, alternating image/text feature rows, a partnership card grid, and an FAQ accordion.",
+      "urlPattern": "/nl/public/over-ons/wie-zijn-we/ons-engagement/*",
+      "blocks": [
+        {
+          "name": "columns-feature",
+          "instances": [
+            ".rich-text-section"
+          ]
+        },
+        {
+          "name": "cards-partner",
+          "instances": [
+            ".multi-pp-block"
+          ]
+        },
+        {
+          "name": "accordion-faq",
+          "instances": [
+            ".accordion-item"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "rc3",
+          "name": "main-content",
+          "selector": [
+            "#sectionkh3l66y3",
+            ".iw_columns.adb_maincontent"
+          ],
+          "style": null,
+          "blocks": [
+            "columns-feature",
+            "cards-partner",
+            "accordion-faq"
+          ],
+          "defaultContent": [
+            ".block-title",
+            "h2.rich-text-title",
+            ".accordion-wrapper h2"
+          ]
+        }
+      ]
+    }
+  ]
+}

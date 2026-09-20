@@ -1,0 +1,10 @@
+{
+  "variantName": "accordion-faq",
+  "baseBlock": "accordion",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Stacked list of bordered rows; each row shows a question with a chevron indicator that expands to reveal an answer. One row per Q&A pair.",
+  "contentPattern": "One row per Q&A item; each row has 2 cells (question/summary cell and answer/body cell).",
+  "usage": "Frequently asked questions or any expandable question/answer content requiring toggle interaction.",
+  "options": [],
+  "memberVariantIds": ["accordion-faq"]
+}

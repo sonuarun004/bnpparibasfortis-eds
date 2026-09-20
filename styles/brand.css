@@ -1,0 +1,30 @@
+:root {
+  /* Typography — BNP Paribas Fortis BNPPSans (see @font-face in fonts.css).
+     Headings/UI use the regular weight; body copy uses the light weight. */
+  --heading-font-family: bnppsans, helvetica, arial, sans-serif;
+  --body-font-family: bnppsans-light, helvetica, arial, sans-serif;
+
+  /* Colors */
+  --background-color: rgb(241 242 246);
+  --text-color: rgb(51 51 51);
+  --link-color: rgb(0 150 94);
+  --link-hover-color: rgb(0 120 75);
+
+  /* Neutral surfaces */
+  --surface-color: rgb(255 255 255);
+  --border-color: rgb(229 229 229);
+  --border-color-strong: rgb(183 183 183);
+
+  /* Spacing */
+  --section-padding: 40px;
+  --content-max-width: 1200px;
+  --nav-height: 64px;
+
+  /* Heading sizes (desktop) */
+  --heading-size-xxl: 32px;
+  --heading-size-xl: 18px;
+  --heading-size-l: 18px;
+  --heading-size-m: 16px;
+  --heading-size-s: 15px;
+  --heading-size-xs: 14px;
+}

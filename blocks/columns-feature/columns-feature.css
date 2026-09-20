@@ -1,0 +1,85 @@
+/* columns-feature — alternating image/text feature rows.
+   Values extracted from source .rich-text-section computed styles. */
+
+/* the row (single row per block instance) */
+.columns-feature > div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 64px;
+}
+
+/* columns / cells */
+.columns-feature > div > div {
+  box-sizing: border-box;
+  order: 1;
+}
+
+/* image column stacks on top on mobile */
+.columns-feature > div > .columns-feature-img-col {
+  order: 0;
+  margin-bottom: 24px;
+}
+
+/* image fills its column */
+.columns-feature picture {
+  display: block;
+}
+
+.columns-feature img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* typography */
+.columns-feature h2 {
+  margin: 0 0 8px;
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  color: var(--text-color);
+}
+
+.columns-feature p {
+  margin: 0 0 24px;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--text-color);
+}
+
+.columns-feature p:last-child {
+  margin-bottom: 0;
+}
+
+.columns-feature a:any-link {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.columns-feature a:hover {
+  text-decoration: underline;
+}
+
+/* desktop: side-by-side 50/50, vertically centered */
+@media (width >= 900px) {
+  .columns-feature > div {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 96px;
+  }
+
+  .columns-feature > div > div {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 12px;
+    order: unset;
+  }
+
+  .columns-feature > div > .columns-feature-img-col {
+    margin-bottom: 0;
+  }
+}

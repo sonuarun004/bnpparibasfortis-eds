@@ -1,0 +1,10 @@
+{
+  "variantName": "cards-partner",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Responsive grid of bordered cards; each card has an image on top with a title and description paragraph below. Cards are uniform in size and wrap into rows.",
+  "contentPattern": "One row per card; each row has 2 cells (image cell and a text cell containing heading + paragraph).",
+  "usage": "Repeating, uniform, self-contained partnership/initiative items shown in a grid.",
+  "options": [],
+  "memberVariantIds": ["cards-partner"]
+}
