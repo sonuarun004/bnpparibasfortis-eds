@@ -147,11 +147,23 @@ async function loadEager(doc) {
 }
 
 /**
+ * Whether the page currently being viewed is itself a global fragment
+ * (the nav or footer document). Those pages carry the fragment content in
+ * <main>; injecting the global header/footer chrome as well would render the
+ * fragment twice when it is opened standalone. Real content pages are unaffected.
+ * @returns {boolean}
+ */
+function isFragmentPage() {
+  return /(^|\/)(nav|footer)$/.test(window.location.pathname.replace(/\.html?$/, ''));
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  loadHeader(doc.querySelector('header'));
+  const fragmentPage = isFragmentPage();
+  if (!fragmentPage) loadHeader(doc.querySelector('header'));
 
   const main = doc.querySelector('main');
   await loadSections(main);
@@ -160,7 +172,7 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadFooter(doc.querySelector('footer'));
+  if (!fragmentPage) loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
