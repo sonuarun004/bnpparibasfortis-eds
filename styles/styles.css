@@ -289,7 +289,9 @@ main img {
 
 /* sections */
 main > .section {
-  margin: 40px 0;
+  margin: 0;
+  padding: 40px 0;
+  background-color: var(--surface-color);
 }
 
 main > .section > div {
