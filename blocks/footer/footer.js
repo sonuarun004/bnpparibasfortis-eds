@@ -74,10 +74,27 @@ function buildLegalBand(section) {
 
   const cardstop = document.createElement('div');
   cardstop.className = 'footer-cardstop';
+
+  // Card Stop icon lives in the code repo at /icons/stopcard.png. Content-bus
+  // ingestion strips <img> from the fragment on publish, so render it here from
+  // the repo asset rather than relying on the fragment carrying the image.
+  const icon = document.createElement('img');
+  icon.src = '/icons/stopcard.png';
+  icon.alt = 'Card Stop';
+  icon.className = 'footer-cardstop-icon';
+  icon.width = 102;
+  icon.height = 102;
+  cardstop.append(icon);
+
+  // Text block: the label + phone paragraphs (skip the image-only paragraph).
+  const textWrap = document.createElement('div');
+  textWrap.className = 'footer-cardstop-text';
   [...section.children].forEach((el) => {
-    if (el.tagName === 'P') cardstop.append(el.cloneNode(true));
+    if (el.tagName !== 'P') return;
+    if (el.querySelector('img') && !el.textContent.trim()) return; // image-only <p>
+    textWrap.append(el.cloneNode(true));
   });
-  resolveImagePaths(cardstop);
+  cardstop.append(textWrap);
 
   const legalLinks = section.querySelector('ul');
   const linksWrap = document.createElement('div');
