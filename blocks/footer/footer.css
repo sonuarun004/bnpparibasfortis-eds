@@ -2,7 +2,7 @@
    Mobile-first: base styles are mobile; min-width media queries enhance. */
 
 footer {
-  background-color: #fff;
+  background-color: transparent;
   border-top: 1px solid var(--border-color);
   font-size: var(--body-font-size-xs);
   color: var(--text-color);
