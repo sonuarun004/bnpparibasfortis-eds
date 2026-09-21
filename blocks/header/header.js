@@ -214,18 +214,21 @@ function buildUtilityBar(section) {
 
   const brand = document.createElement('div');
   brand.className = 'nav-brand';
-  if (logoP) {
-    const clone = logoP.cloneNode(true);
-    // The fragment uses relative image paths (images/...) that resolve against
-    // the fragment's /content location, not the current page URL.
-    clone.querySelectorAll('img[src]').forEach((img) => {
-      const raw = img.getAttribute('src');
-      if (raw && !/^(https?:)?\/\//.test(raw) && !raw.startsWith('/')) {
-        img.setAttribute('src', `/content/${raw}`);
-      }
-    });
-    brand.append(clone);
-  }
+  // Logo lives in the code repo at /icons/bnppf-logo.svg. Content-bus ingestion
+  // strips <img> from the nav fragment on publish, so the fragment can't be
+  // relied on to carry the logo image. Instead we always render the logo here
+  // from the repo asset, reusing the fragment's brand link (href) when present.
+  const brandLink = logoP ? logoP.querySelector('a') : null;
+  const link = document.createElement('a');
+  link.href = brandLink ? brandLink.getAttribute('href') : '/be/nl';
+  const logo = document.createElement('img');
+  logo.src = '/icons/bnppf-logo.svg';
+  logo.alt = 'BNP Paribas Fortis';
+  logo.className = 'nav-logo';
+  logo.width = 164;
+  logo.height = 34;
+  link.append(logo);
+  brand.append(link);
 
   const audience = document.createElement('ul');
   audience.className = 'nav-audience';
