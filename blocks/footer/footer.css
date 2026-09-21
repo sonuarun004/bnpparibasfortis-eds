@@ -106,9 +106,22 @@ footer .footer-cardstop-text a:hover {
 
 /* ---- copyright ---- */
 footer .footer-copyright {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin-top: 24px;
-  padding-top: 16px;
+  padding-top: 24px;
   border-top: 1px solid var(--border-color);
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+footer .footer-copyright-brand img {
+  width: 148px;
+  height: auto;
+}
+
+footer .footer-copyright-text p {
   font-size: 13px;
   color: var(--text-color);
 }
@@ -147,5 +160,12 @@ footer .footer-copyright {
   footer .footer-legal-links ul {
     grid-template-columns: repeat(2, auto);
     column-gap: 64px;
+  }
+
+  footer .footer-copyright {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
   }
 }
