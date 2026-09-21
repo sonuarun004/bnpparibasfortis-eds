@@ -237,6 +237,51 @@
     ]
   },
   {
+    "id": "footer",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "cardstop",
+        "label": "Card Stop label + phone",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "legal",
+        "label": "Legal links",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "copyright",
+        "label": "Copyright",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "footer-column",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Column heading",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "links",
+        "label": "Column links",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {

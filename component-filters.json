@@ -68,5 +68,11 @@
       "button",
       "title"
     ]
+  },
+  {
+    "id": "footer",
+    "components": [
+      "footer-column"
+    ]
   }
 ]
