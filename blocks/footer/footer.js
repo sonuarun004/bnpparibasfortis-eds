@@ -248,10 +248,15 @@ export default async function decorate(block) {
     return;
   }
 
-  // Path 2 (legacy): no block content — fetch and decorate the flat fragment.
+  // Path 2: no authored content in this block — fetch the footer fragment.
   const doc = await fetchFooterDocument();
   block.textContent = '';
   if (!doc) return;
-  const parts = partsFromFragment(fragmentSections(doc));
+  // The fragment may itself contain an authored Footer BLOCK (block-form
+  // content) or the legacy flat sections. Prefer the block when present.
+  const embedded = doc.querySelector('.footer.block, .footer');
+  const parts = embedded
+    ? partsFromBlock(embedded)
+    : partsFromFragment(fragmentSections(doc));
   block.append(buildFooterInner(parts));
 }
