@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Header / Footer fragment preview</title>
+
+  <!-- Real global styles, exactly as production loads them -->
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/styles/lazy-styles.css">
+  <link rel="stylesheet" href="/styles/fonts.css">
+
+  <style>
+    /* Preview chrome only — not part of the site */
+    body { margin: 0; }
+
+    .xf-preview-toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 16px;
+      background: #222;
+      color: #fff;
+      font: 14px/1.4 system-ui, sans-serif;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .xf-preview-toolbar strong { margin-right: 8px; }
+
+    .xf-preview-toolbar button {
+      background: #00965e;
+      color: #fff;
+      border: 0;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .xf-preview-toolbar button.secondary { background: #444; }
+    .xf-preview-toolbar .spacer { flex: 1; }
+
+    .xf-preview-label {
+      padding: 8px 16px;
+      background: #f1f2f6;
+      color: #555;
+      font: 12px/1.4 system-ui, sans-serif;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    /* The preview stage carries the same grey page background as the site so the
+       transparent footer/section colours read correctly. */
+    .xf-preview-stage { background: rgb(241 242 246); }
+  </style>
+</head>
+<body>
+  <div class="xf-preview-toolbar">
+    <strong>Fragment preview</strong>
+    <button data-view="both">Header + Footer</button>
+    <button class="secondary" data-view="header">Header only</button>
+    <button class="secondary" data-view="footer">Footer only</button>
+    <span class="spacer"></span>
+    <button class="secondary" data-device="desktop">Desktop</button>
+    <button class="secondary" data-device="mobile">Mobile</button>
+  </div>
+
+  <div class="xf-preview-stage">
+    <div class="xf-preview-label" data-header-label>header — /content/nav.plain.html</div>
+    <header></header>
+
+    <div class="xf-preview-label" data-footer-label>footer — /content/footer.plain.html</div>
+    <footer></footer>
+  </div>
+
+  <script type="module">
+    // Reuse the real EDS decorators so the fragments render exactly as on a page.
+    import {
+      loadHeader,
+      loadFooter,
+      loadCSS,
+      decorateTemplateAndTheme,
+    } from '/scripts/aem.js';
+
+    window.hlx = window.hlx || {};
+    window.hlx.codeBasePath = window.hlx.codeBasePath || '';
+    window.hlx.lighthouse = false;
+
+    async function render() {
+      decorateTemplateAndTheme();
+      // fonts.css is already linked above; load lazy just in case the theme adds more.
+      await loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+      document.body.classList.add('appear');
+
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      if (header) { header.innerHTML = ''; await loadHeader(header); }
+      if (footer) { footer.innerHTML = ''; await loadFooter(footer); }
+    }
+
+    // Toolbar: toggle which fragment is shown
+    document.querySelectorAll('.xf-preview-toolbar [data-view]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+        const hLabel = document.querySelector('[data-header-label]');
+        const fLabel = document.querySelector('[data-footer-label]');
+        const showH = view === 'both' || view === 'header';
+        const showF = view === 'both' || view === 'footer';
+        header.hidden = !showH; hLabel.hidden = !showH;
+        footer.hidden = !showF; fLabel.hidden = !showF;
+      });
+    });
+
+    // Toolbar: emulate device width by constraining the stage
+    document.querySelectorAll('.xf-preview-toolbar [data-device]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const stage = document.querySelector('.xf-preview-stage');
+        if (btn.dataset.device === 'mobile') {
+          stage.style.maxWidth = '390px';
+          stage.style.margin = '0 auto';
+          stage.style.boxShadow = '0 0 0 1px #ccc';
+        } else {
+          stage.style.maxWidth = '';
+          stage.style.margin = '';
+          stage.style.boxShadow = '';
+        }
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
