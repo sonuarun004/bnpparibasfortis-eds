@@ -19,12 +19,13 @@ footer p {
 }
 
 footer a {
-  color: var(--text-color);
+  color: var(--link-color);
   text-decoration: none;
 }
 
 footer a:hover {
   color: var(--link-color);
+  text-decoration: underline;
 }
 
 footer ul {
