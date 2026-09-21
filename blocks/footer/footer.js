@@ -113,8 +113,25 @@ function buildLegalBand(section) {
 function buildCopyright(section) {
   const region = document.createElement('div');
   region.className = 'footer-copyright';
-  [...section.children].forEach((el) => region.append(el.cloneNode(true)));
-  resolveImagePaths(region);
+
+  // Brand logo on the left, from the code repo (/icons/bnppf-logo.svg) so it
+  // survives content-bus publishing, mirroring the header logo.
+  const brand = document.createElement('div');
+  brand.className = 'footer-copyright-brand';
+  const logo = document.createElement('img');
+  logo.src = '/icons/bnppf-logo.svg';
+  logo.alt = 'BNP Paribas Fortis';
+  logo.width = 164;
+  logo.height = 34;
+  brand.append(logo);
+
+  // Copyright text on the right, from the fragment.
+  const text = document.createElement('div');
+  text.className = 'footer-copyright-text';
+  [...section.children].forEach((el) => text.append(el.cloneNode(true)));
+  resolveImagePaths(text);
+
+  region.append(brand, text);
   return region;
 }
 
