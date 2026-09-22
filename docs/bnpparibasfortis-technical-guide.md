@@ -60,7 +60,7 @@ no re-authoring.
 - `content/be/nl/…/sponsoring` — the Belgium NL Live-Copy seed
 
 **Pending on the AEM author instance** (see the full runbook at
-`migration-work/msm-setup-runbook.md`): create the blueprint folders, the `fr`/`en`
+`docs/msm-setup-runbook.md`): create the blueprint folders, the `fr`/`en`
 language copies, the rollout config, and the `be/{nl,fr,en}` Live Copies, then
 publish. `helix-query.yaml` already excludes `/language-masters/**` from the public
 index/sitemap so blueprint pages aren't indexed.
@@ -127,7 +127,7 @@ The footer can be authored in Universal Editor via the `footer` block model
   `copyright`.
 - **Footer Column** (repeatable item) — fields: `heading`, `links`.
 
-**Import block table** (full detail in `migration-work/footer-import-block-table.md`;
+**Import block table** (full detail in `docs/footer-import-block-table.md`;
 ready-to-ingest markup in `tools/importer/footer-block-source.html`):
 
 | Row | Cell 1 | Cell 2 |
@@ -192,7 +192,7 @@ Pages are imported with the project's bundled importer, not hand-written:
   `MSM_TARGET`: `language-masters/nl` or `be/nl`)
 
 Run: bundle the import script, then run the bulk import against the source URL. The
-importer writes `content/**/*.plain.html`. See `migration-work/migration-plan.md`.
+importer writes `content/**/*.plain.html`. See `docs/migration-plan.md`.
 
 > **Source-site note:** `www.bnpparibasfortis.be` was under HTTP 503 maintenance and
 > its image CDN 403-blocks scrapers. Content was recovered from a Wayback snapshot +
@@ -233,9 +233,12 @@ importer writes `content/**/*.plain.html`. See `migration-work/migration-plan.md
 
 | File | What it is |
 |------|-----------|
-| `migration-work/migration-plan.md` | Overall migration plan & status |
-| `migration-work/msm-setup-runbook.md` | Step-by-step AEM author MSM setup |
-| `migration-work/footer-import-block-table.md` | Footer UE block table + field mapping |
+| `docs/migration-plan.md` | Overall migration plan & status |
+| `docs/msm-setup-runbook.md` | Step-by-step AEM author MSM setup |
+| `docs/footer-import-block-table.md` | Footer UE block table + field mapping |
 | `tools/importer/footer-block-source.html` | Ready-to-ingest footer block markup |
 | `tools/preview/fragments.html` | Standalone header/footer preview tool |
+
+> These docs also have working copies under `migration-work/` (git-ignored scratch);
+> the versioned source of truth is here in `docs/`.
 | `AGENTS.md` | Project coding standards & EDS conventions |
