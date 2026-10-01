@@ -229,7 +229,116 @@ importer writes `content/**/*.plain.html`. See `docs/migration-plan.md`.
 
 ---
 
-## 9. Reference files
+## 9. Creating a new custom block (example: Tabs)
+
+Every Universal-Editor-editable block follows the same steps. Tabs is used as the
+example.
+
+### 9.1 Decide what the author will enter
+Agree on this first, because the JS depends on it. For tabs: **one row per tab**,
+with **cell 1 = tab label** and **cell 2 = tab content**.
+
+### 9.2 Create the block folder
+```
+blocks/tabs/
+├── tabs.js       # decoration logic
+├── tabs.css      # styles, all scoped to .tabs
+└── _tabs.json    # Universal Editor model (definitions, models, filters)
+```
+
+### 9.3 Define the model in `_tabs.json`
+Use a container ("Tabs") plus a repeatable item ("Tab"), the same pattern as
+`cards-partner`:
+```json
+{
+  "definitions": [
+    { "title": "Tabs", "id": "tabs",
+      "plugins": { "xwalk": { "page": {
+        "resourceType": "core/franklin/components/block/v1/block",
+        "template": { "name": "Tabs", "filter": "tabs" } } } } },
+    { "title": "Tab", "id": "tab",
+      "plugins": { "xwalk": { "page": {
+        "resourceType": "core/franklin/components/block/v1/block/item",
+        "template": { "name": "Tab", "model": "tab" } } } } }
+  ],
+  "models": [
+    { "id": "tab", "fields": [
+      { "component": "text", "name": "label", "label": "Tab label", "valueType": "string" },
+      { "component": "richtext", "name": "content", "label": "Tab content", "valueType": "string" }
+    ] }
+  ],
+  "filters": [ { "id": "tabs", "components": ["tab"] } ]
+}
+```
+Two model rules the linter enforces:
+- **Max 4 cells per block.**
+- **Avoid field names ending in `Title`, `Type`, `Alt`, `MimeType` or `Text`.**
+  Those suffixes collapse into another field.
+
+The definition `title` / template `name` must match the block name exactly
+("Tabs", not "TABS").
+
+### 9.4 Register the block in the section filter
+In `models/_section.json`, add `"tabs"` to the section's `components` list (next to
+`cards-partner`, `accordion-faq`). Without this, authors can't add the block in
+Universal Editor.
+
+### 9.5 Rebuild the aggregate files
+```bash
+npm run build:json   # regenerates component-definition/models/filters.json
+```
+
+### 9.6 Write `tabs.js`
+```js
+export default function decorate(block) {
+  // 1. read rows → [label, content] per tab
+  // 2. build a tab list of <button role="tab"> plus <div role="tabpanel"> panels
+  // 3. wire aria-selected / aria-controls / hidden; first tab active
+  // 4. click + arrow-key handlers to switch tabs
+  // 5. replace block contents with the new structure
+}
+```
+Handle missing cells gracefully, and keep the accessibility attributes (`role`,
+`aria-*`, keyboard support).
+
+### 9.7 Write `tabs.css`
+- Scope every selector: `.tabs .tabs-list`, not `.tabs-list`.
+- Write mobile-first, with `min-width` breakpoints at 600 / 900 / 1200px.
+- Avoid `tabs-container` / `tabs-wrapper` class names; those are used on sections.
+
+### 9.8 Test locally with sample content
+Create `drafts/tabs.plain.html` containing the block markup, with field hints in
+each cell:
+```html
+<div><div class="tabs">
+  <div><div><!-- field:label -->Tab 1</div><div><!-- field:content --><p>Content 1</p></div></div>
+  <div><div><!-- field:label -->Tab 2</div><div><!-- field:content --><p>Content 2</p></div></div>
+</div></div>
+```
+Run `aem up --html-folder drafts` and open `http://localhost:3000/tabs`.
+
+### 9.9 Lint
+```bash
+npm run lint      # JS (ESLint), CSS (Stylelint) and the xwalk model rules
+```
+
+### 9.10 Ship
+1. Create a branch, commit and push. Code Sync builds the feature preview at
+   `https://<branch>--bnpparibasfortis-eds--sonuarun004.aem.page/`.
+2. Open a PR **with a test URL** that shows the block.
+3. Merge. Code Sync deploys it to `main`.
+
+### 9.11 Author in AEM
+In Universal Editor, open a page, add **Tabs** to a section, add **Tab** items,
+fill in the label and content, then publish.
+
+### 9.12 Document it
+Add a `README.md` in `blocks/tabs/` covering the fields and an authoring example,
+and add an entry to this guide (§3).
+
+---
+
+## 10. Reference files
 
 | File | What it is |
 |------|-----------|
@@ -238,7 +347,7 @@ importer writes `content/**/*.plain.html`. See `docs/migration-plan.md`.
 | `docs/footer-import-block-table.md` | Footer UE block table + field mapping |
 | `tools/importer/footer-block-source.html` | Ready-to-ingest footer block markup |
 | `tools/preview/fragments.html` | Standalone header/footer preview tool |
+| `AGENTS.md` | Project coding standards & EDS conventions |
 
 > These docs also have working copies under `migration-work/` (git-ignored scratch);
 > the versioned source of truth is here in `docs/`.
-| `AGENTS.md` | Project coding standards & EDS conventions |
