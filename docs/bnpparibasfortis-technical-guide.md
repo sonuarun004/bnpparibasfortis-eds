@@ -65,6 +65,59 @@ language copies, the rollout config, and the `be/{nl,fr,en}` Live Copies, then
 publish. `helix-query.yaml` already excludes `/language-masters/**` from the public
 index/sitemap so blueprint pages aren't indexed.
 
+### 2.1 Domain mapping for the BE site (target setup)
+
+Adobe's MSM pattern for Edge Delivery is **one aem.live site per MSM country site**,
+all sharing this Git repo ("repoless"). The BE domain is rooted at
+`/content/bnpparibasfortis/be`, so public URLs start with the language:
+
+| AEM path | Public URL on `www.bnpparibasfortis.be` |
+|----------|------------------------------------------|
+| `/content/bnpparibasfortis/be/nl/over-ons/…/sponsoring` | `/nl/over-ons/…/sponsoring` |
+| `/content/bnpparibasfortis/be/fr/…` | `/fr/…` |
+| `/content/bnpparibasfortis/be/en/…` | `/en/…` |
+| `/content/bnpparibasfortis/language-masters/**` | not published |
+
+Setup (admin rights required; see `docs/msm-setup-runbook.md` Part C):
+1. Enable repoless for the project (one-time).
+2. Create the aem.live site `bnpparibasfortis-be` via the configuration service,
+   same code repo, content source `…/bin/franklin.delivery/sonuarun004/bnpparibasfortis-be/main`.
+3. Path mapping for that site: mappings `"/content/bnpparibasfortis/be/:/"`,
+   includes `"/content/bnpparibasfortis/be/"`.
+4. AEM author: create `/conf/bnpparibasfortis/be`, assign it to
+   `/content/bnpparibasfortis/be`, and add an Edge Delivery Services cloud config
+   for site `bnpparibasfortis-be` (type "aem.live with repoless config").
+5. Redirect the domain root with a redirects sheet at
+   `/content/bnpparibasfortis/be/redirects`: Source `/` → Destination `/nl/`
+   (or the sponsoring page until a `/nl/` home page exists). Test on `.aem.page`.
+6. CDN: point `www.bnpparibasfortis.be` at `main--bnpparibasfortis-be--sonuarun004.aem.live`.
+
+Another country later (e.g. `lu`) = another site `bnpparibasfortis-lu` mapped to
+`/content/bnpparibasfortis/lu/:/`, same code.
+
+### 2.2 Locale handling in code
+
+`getLocale()` in `scripts/scripts.js` reads the language from the first of the
+leading URL segments that is a supported language (`LANGUAGES = ['nl','fr','en']`,
+first = default). It works on every URL shape: `/nl/…` (BE site), `/be/nl/…`
+(brand-level site) and `/content/be/nl/…` (local dev). It drives:
+- `<html lang>` (set in `loadEager`),
+- the header language switcher: the toggle shows the current language, each entry
+  links to the **same page** with the language segment swapped (`localeUrl()`),
+  the current one is marked `aria-current`,
+- the header logo link (current locale's home, `/{lang}/`),
+- per-locale nav/footer: `header.js`/`footer.js` fetch `/{lang}/nav` and
+  `/{lang}/footer` first (e.g. a translated Live Copy) and fall back to the shared
+  root fragments.
+
+The nav fragment's language list only needs the language codes as link text
+(`NL` / `FR` / `EN`); its hrefs (`/nl/`, `/fr/`, `/en/`) are fallbacks for pages
+without a locale.
+
+> **Caveat:** swapping the language segment assumes the same page name in every
+> language, which MSM language copies keep by default. If French pages get
+> translated URL names, the switcher would land on a 404 for those pages.
+
 ---
 
 ## 3. Page content blocks
@@ -97,9 +150,10 @@ npm run lint         # validates JS, CSS, and xwalk models
 The header and footer are **global**, edited once and shown on every page. They
 are decorated by `blocks/header/header.js` and `blocks/footer/footer.js`.
 
-- **Header** — content-first **fragment**. `header.js` fetches `content/nav.plain.html`
-  (dual-fetch: `/content/nav.plain.html` then `/nav.plain.html`) and builds the
-  utility bar (logo, audience tabs, search, language) + main nav with click
+- **Header** — content-first **fragment**. `header.js` fetches the locale's own
+  `/{lang}/nav.plain.html` if present, else the shared fragment (dual-fetch:
+  `/content/nav.plain.html` then `/nav.plain.html`), and builds the utility bar
+  (logo, audience tabs, search, language switcher — see §2.2) + main nav with click
   megamenus.
 - **Footer** — **hybrid**. `footer.js` decorates an authored **Footer block** when
   present (Universal-Editor editable), and otherwise falls back to fetching the
