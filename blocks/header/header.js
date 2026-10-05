@@ -2,14 +2,22 @@
 // builds a two-row header: a utility bar (logo, audience, search/contact,
 // language) and a main navigation bar with click-triggered megamenu panels.
 
+import { LANGUAGES, getLocale, localeUrl } from '../../scripts/scripts.js';
+
 const DESKTOP = window.matchMedia('(min-width: 900px)');
 
 /**
- * Fetch the nav fragment (metadata-independent dual-fetch).
+ * Fetch the nav fragment. A locale's own nav (/{lang}/nav, e.g. the Live Copy
+ * under /be/fr) wins; otherwise fall back to the shared root fragment
+ * (metadata-independent dual-fetch: /content/nav.plain.html, then /nav.plain.html).
  * @returns {Promise<Document|null>}
  */
 async function fetchNavDocument() {
-  let resp = await fetch('/content/nav.plain.html');
+  const locale = getLocale();
+  let resp = locale.matched
+    ? await fetch(`${locale.base}/${locale.language}/nav.plain.html`)
+    : { ok: false };
+  if (!resp.ok) resp = await fetch('/content/nav.plain.html');
   if (!resp.ok) resp = await fetch('/nav.plain.html');
   if (!resp.ok) return null;
   const html = await resp.text();
@@ -217,10 +225,13 @@ function buildUtilityBar(section) {
   // Logo lives in the code repo at /icons/bnppf-logo.svg. Content-bus ingestion
   // strips <img> from the nav fragment on publish, so the fragment can't be
   // relied on to carry the logo image. Instead we always render the logo here
-  // from the repo asset, reusing the fragment's brand link (href) when present.
+  // from the repo asset. The logo links to the current locale's home page;
+  // outside a locale it uses the fragment's brand link.
+  const locale = getLocale();
   const brandLink = logoP ? logoP.querySelector('a') : null;
   const link = document.createElement('a');
-  link.href = brandLink ? brandLink.getAttribute('href') : '/be/nl';
+  if (locale.matched) link.href = `${locale.base}/${locale.language}/`;
+  else link.href = brandLink ? brandLink.getAttribute('href') : '/';
   const logo = document.createElement('img');
   logo.src = '/icons/bnppf-logo.svg';
   logo.alt = 'BNP Paribas Fortis';
@@ -248,13 +259,16 @@ function buildUtilityBar(section) {
     tools.append(li);
   });
 
-  // Language selector: current locale (first link) shown with a chevron; the
-  // remaining locales drop down on click.
+  // Language selector. The fragment lists the languages (link text = language
+  // code, e.g. NL / FR / EN). Each entry links to the current page in that
+  // language (same path, language segment swapped); the toggle shows the
+  // language of the page being viewed.
   const langLinks = lists[2] ? [...lists[2].querySelectorAll('a')] : [];
   const lang = document.createElement('div');
   lang.className = 'nav-lang';
   if (langLinks.length) {
-    const current = langLinks[0];
+    const codeOf = (a) => a.textContent.trim().toLowerCase();
+    const current = langLinks.find((a) => codeOf(a) === locale.language) || langLinks[0];
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'nav-lang-toggle';
@@ -267,7 +281,15 @@ function buildUtilityBar(section) {
     menu.hidden = true;
     langLinks.forEach((a) => {
       const li = document.createElement('li');
-      li.append(a.cloneNode(true));
+      const item = a.cloneNode(true);
+      const code = codeOf(a);
+      if (LANGUAGES.includes(code)) {
+        item.href = localeUrl(code, locale);
+        item.hreflang = code;
+        item.lang = code;
+      }
+      if (a === current) item.setAttribute('aria-current', 'true');
+      li.append(item);
       menu.append(li);
     });
 

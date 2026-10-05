@@ -7,15 +7,23 @@
 // Brand imagery (Card Stop icon, logo) is served from the code repo /icons/
 // so it survives publishing and needs no authoring.
 
+import { getLocale } from '../../scripts/scripts.js';
+
 const CARDSTOP_ICON = '/icons/stopcard.png';
 const COPYRIGHT_LOGO = '/icons/bnppf-logo.svg';
 
 /**
- * Fetch the footer fragment (metadata-independent dual-fetch). Legacy path.
+ * Fetch the footer fragment. A locale's own footer (/{lang}/footer) wins;
+ * otherwise fall back to the shared root fragment (metadata-independent
+ * dual-fetch: /content/footer.plain.html, then /footer.plain.html).
  * @returns {Promise<Document|null>}
  */
 async function fetchFooterDocument() {
-  let resp = await fetch('/content/footer.plain.html');
+  const locale = getLocale();
+  let resp = locale.matched
+    ? await fetch(`${locale.base}/${locale.language}/footer.plain.html`)
+    : { ok: false };
+  if (!resp.ok) resp = await fetch('/content/footer.plain.html');
   if (!resp.ok) resp = await fetch('/footer.plain.html');
   if (!resp.ok) return null;
   const html = await resp.text();

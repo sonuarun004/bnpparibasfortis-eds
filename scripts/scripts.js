@@ -45,6 +45,47 @@ export function moveInstrumentation(from, to) {
   );
 }
 
+/** Languages the site is published in. The first one is the default. */
+export const LANGUAGES = ['nl', 'fr', 'en'];
+
+/**
+ * Work out the current locale from the URL. The language is the first of the
+ * leading path segments that is a supported language code, so this works in
+ * every environment:
+ *   /nl/over-ons/...            country site (BE root mapped to the domain)
+ *   /be/nl/over-ons/...         brand-level site
+ *   /content/be/nl/over-ons/... local dev server
+ * @param {string} [pathname]
+ * @returns {{language: string, base: string, rest: string, matched: boolean}}
+ *   base: path before the language segment; rest: path after it
+ */
+export function getLocale(pathname = window.location.pathname) {
+  const segments = pathname.split('/');
+  const index = segments.findIndex((s, i) => i > 0 && i <= 3 && LANGUAGES.includes(s));
+  if (index === -1) {
+    return {
+      language: LANGUAGES[0], base: '', rest: '/', matched: false,
+    };
+  }
+  return {
+    language: segments[index],
+    base: segments.slice(0, index).join('/'),
+    rest: `/${segments.slice(index + 1).join('/')}`,
+    matched: true,
+  };
+}
+
+/**
+ * URL of the current page in another language. On a page without a locale
+ * this is the language's home page.
+ * @param {string} language target language code
+ * @param {object} [locale] result of getLocale()
+ * @returns {string}
+ */
+export function localeUrl(language, locale = getLocale()) {
+  return `${locale.base}/${language}${locale.rest}`;
+}
+
 /**
  * load fonts.css and set a session storage flag
  */
@@ -127,7 +168,7 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  document.documentElement.lang = getLocale().language;
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {

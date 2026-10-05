@@ -117,6 +117,98 @@ The EDS delivery must mirror the AEM tree. Changes made in the repo:
 > Consider excluding `/language-masters/**` from the sitemap/robots so blueprint pages aren't
 > indexed publicly (add an exclude to `helix-query.yaml` / `helix-sitemap.yaml`).
 
+> Part B describes the current single-site setup (`bnpparibasfortis-eds`, whole brand tree
+> published, URLs `/be/{lang}/…`). The target setup for the BE domain is Part C.
+
+---
+
+## Part C — BE country site + domain mapping (repoless, target setup)
+
+Follows Adobe's "Multi site management with AEM authoring as your content source"
+(aem.live): **one aem.live site per MSM country site**, all sharing this Git repo. The BE
+domain is rooted at `/content/bnpparibasfortis/be`, so URLs are `/nl/…`, `/fr/…`, `/en/…`,
+and language masters are never published.
+
+### C1. Enable repoless
+One-time, for the project (see aem.live "Reusing code across sites with AEM authoring").
+
+### C2. Create the BE aem.live site
+Same code repo, content source pointing at a site named `bnpparibasfortis-be`
+(admin token required — never paste it in chat):
+```bash
+curl -X POST "https://admin.hlx.page/config/sonuarun004/sites/bnpparibasfortis-be.json" \
+  -H 'Content-Type: application/json' -H 'x-auth-token: <token>' \
+  --data '{
+    "code": { "owner": "sonuarun004", "repo": "bnpparibasfortis-eds",
+      "source": { "type": "github", "url": "https://github.com/sonuarun004/bnpparibasfortis-eds" } },
+    "content": { "source": {
+      "url": "https://author-p9652-e115365.adobeaemcloud.com/bin/franklin.delivery/sonuarun004/bnpparibasfortis-be/main",
+      "type": "markup", "suffix": ".html" } },
+    "access": { "admin": { "role": {
+      "admin": ["<email>"], "config_admin": ["<tech-account-id>@techacct.adobe.com"] },
+      "requireAuth": "auto" } }
+  }'
+```
+
+### C3. Path mapping for the BE site
+```bash
+curl -X POST "https://admin.hlx.page/config/sonuarun004/sites/bnpparibasfortis-be/public.json" \
+  -H 'Content-Type: application/json' -H 'x-auth-token: <token>' \
+  --data '{
+    "paths": {
+      "mappings": [
+        "/content/bnpparibasfortis/be/:/",
+        "/content/bnpparibasfortis/be/redirects:/redirects"
+      ],
+      "includes": [ "/content/bnpparibasfortis/be/" ]
+    }
+  }'
+```
+Verify: `https://main--bnpparibasfortis-be--sonuarun004.aem.page/config.json`.
+
+### C4. AEM author configuration
+1. Tools → General → Configuration Browser: create `/conf/bnpparibasfortis/be`
+   (enable Cloud Configuration).
+2. Sites → `/content/bnpparibasfortis/be` → Properties → Advanced: untick "Inherited from
+   /content/bnpparibasfortis", set Cloud Configuration to `/conf/bnpparibasfortis/be`.
+3. Tools → Cloud Services → Edge Delivery Services Configuration → `be` folder → Create:
+   organization `sonuarun004`, site `bnpparibasfortis-be`, project type
+   "aem.live with repoless config setup".
+
+### C5. Redirect the domain root
+Create a redirects sheet at `/content/bnpparibasfortis/be/redirects` (published as
+`/redirects.json`):
+
+| Source | Destination |
+|--------|-------------|
+| `/` | `/nl/` |
+
+Until a `/nl/` home page exists, use `/nl/over-ons/wie-zijn-we/ons-engagement/sponsoring`
+as the destination. Test on `.aem.page` before publishing.
+
+### C6. Domain
+Point `www.bnpparibasfortis.be` at `main--bnpparibasfortis-be--sonuarun004.aem.live` on the
+CDN (Adobe Managed or BYO CDN).
+
+### C7. Per-locale nav/footer (optional)
+The code fetches `/{lang}/nav` and `/{lang}/footer` first and falls back to the shared
+fragments, so each language can get its own translated nav/footer as a page under
+`/content/bnpparibasfortis/be/{lang}/`.
+
+### Resulting URLs
+
+| AEM path | URL on `www.bnpparibasfortis.be` |
+|----------|----------------------------------|
+| `/content/bnpparibasfortis/be/nl/over-ons/…/sponsoring` | `/nl/over-ons/…/sponsoring` |
+| `/content/bnpparibasfortis/be/fr/…` | `/fr/…` |
+| `/content/bnpparibasfortis/be/en/…` | `/en/…` |
+| `/content/bnpparibasfortis/language-masters/**` | not published |
+
+Code side (already done in the repo): `getLocale()` / `localeUrl()` in `scripts/scripts.js`
+read the language from the URL on any shape (`/nl/…`, `/be/nl/…`, `/content/be/nl/…`),
+so the switcher, `<html lang>`, logo link and nav/footer lookup work before and after the
+switch.
+
 ---
 
 ## Status / blockers
