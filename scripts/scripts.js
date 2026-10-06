@@ -86,6 +86,35 @@ export function localeUrl(language, locale = getLocale()) {
   return `${locale.base}/${language}${locale.rest}`;
 }
 
+/** Locale whose nav/footer is used when a page has no locale of its own. */
+export const DEFAULT_LOCALE_ROOT = '/be/nl';
+
+/**
+ * Fetch the first URL that responds OK.
+ * @param {string[]} urls
+ * @returns {Promise<Response|null>}
+ */
+async function fetchFirst(urls) {
+  if (!urls.length) return null;
+  const resp = await fetch(urls[0]);
+  return resp.ok ? resp : fetchFirst(urls.slice(1));
+}
+
+/**
+ * Fetch a global fragment (nav, footer) for the current page: the page's own
+ * locale first (e.g. /be/fr/nav), then the default locale (/be/nl/nav).
+ * @param {string} name fragment name, e.g. 'nav'
+ * @returns {Promise<Document|null>}
+ */
+export async function fetchLocaleFragment(name) {
+  const locale = getLocale();
+  const urls = [`${DEFAULT_LOCALE_ROOT}/${name}.plain.html`];
+  if (locale.matched) urls.unshift(`${locale.base}/${locale.language}/${name}.plain.html`);
+  const resp = await fetchFirst([...new Set(urls)]);
+  if (!resp) return null;
+  return new DOMParser().parseFromString(await resp.text(), 'text/html');
+}
+
 /**
  * load fonts.css and set a session storage flag
  */

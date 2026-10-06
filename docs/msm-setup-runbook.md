@@ -190,10 +190,13 @@ as the destination. Test on `.aem.page` before publishing.
 Point `www.bnpparibasfortis.be` at `main--bnpparibasfortis-be--sonuarun004.aem.live` on the
 CDN (Adobe Managed or BYO CDN).
 
-### C7. Per-locale nav/footer (optional)
-The code fetches `/{lang}/nav` and `/{lang}/footer` first and falls back to the shared
-fragments, so each language can get its own translated nav/footer as a page under
-`/content/bnpparibasfortis/be/{lang}/`.
+### C7. Per-locale nav/footer
+The code fetches `/{lang}/nav` and `/{lang}/footer` first and falls back to the default
+locale (`/be/nl/nav`, `/be/nl/footer`; `DEFAULT_LOCALE_ROOT` in `scripts/scripts.js`).
+Author them in `language-masters/{lang}/`, roll out to `be/{lang}/`, publish there. The
+old root `/content/bnpparibasfortis/nav` and `footer` are not used and can be deleted once
+`be/nl/nav` and `be/nl/footer` are live. After the BE site moves to the domain root,
+change `DEFAULT_LOCALE_ROOT` to `/nl`.
 
 ### Resulting URLs
 

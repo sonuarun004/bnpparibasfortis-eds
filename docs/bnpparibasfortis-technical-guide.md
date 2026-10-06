@@ -106,9 +106,11 @@ first = default). It works on every URL shape: `/nl/…` (BE site), `/be/nl/…`
   links to the **same page** with the language segment swapped (`localeUrl()`),
   the current one is marked `aria-current`,
 - the header logo link (current locale's home, `/{lang}/`),
-- per-locale nav/footer: `header.js`/`footer.js` fetch `/{lang}/nav` and
-  `/{lang}/footer` first (e.g. a translated Live Copy) and fall back to the shared
-  root fragments.
+- per-locale nav/footer: `fetchLocaleFragment()` loads the page locale's own
+  `/{lang}/nav` and `/{lang}/footer` (the Live Copies under `be/{lang}`) and falls
+  back to the **default locale** `DEFAULT_LOCALE_ROOT = '/be/nl'` (`/be/nl/nav`,
+  `/be/nl/footer`). Pages without a locale (e.g. the 404 page) use the default
+  locale directly. The old root `/nav` and `/footer` are no longer used.
 
 The nav fragment's language list only needs the language codes as link text
 (`NL` / `FR` / `EN`); its hrefs (`/nl/`, `/fr/`, `/en/`) are fallbacks for pages
@@ -150,14 +152,17 @@ npm run lint         # validates JS, CSS, and xwalk models
 The header and footer are **global**, edited once and shown on every page. They
 are decorated by `blocks/header/header.js` and `blocks/footer/footer.js`.
 
-- **Header** — content-first **fragment**. `header.js` fetches the locale's own
-  `/{lang}/nav.plain.html` if present, else the shared fragment (dual-fetch:
-  `/content/nav.plain.html` then `/nav.plain.html`), and builds the utility bar
-  (logo, audience tabs, search, language switcher — see §2.2) + main nav with click
-  megamenus.
+- **Header** — content-first **fragment**. `header.js` fetches the locale's
+  `/{lang}/nav.plain.html`, falling back to the default locale's `/be/nl/nav.plain.html`
+  (see §2.2), and builds the utility bar (logo, audience tabs, search, language
+  switcher) + main nav with click megamenus.
 - **Footer** — **hybrid**. `footer.js` decorates an authored **Footer block** when
-  present (Universal-Editor editable), and otherwise falls back to fetching the
-  `content/footer.plain.html` fragment. See §4.3.
+  present (Universal-Editor editable), and otherwise fetches the locale's
+  `/{lang}/footer` fragment, falling back to `/be/nl/footer`. See §4.3.
+
+The nav and footer are pages in the MSM tree: authored in
+`language-masters/{lang}/nav|footer`, rolled out to `be/{lang}/nav|footer` (Live
+Copies) and published from there.
 
 ### 4.2 Brand imagery (logo, Card Stop icon)
 
@@ -209,14 +214,20 @@ appear once). Guard: `isFragmentPage()` in `scripts/scripts.js`.
 ## 5. Editing the header / footer
 
 ### 5.1 Edit fragment content (text)
-- Header links/labels/language: edit `content/nav.plain.html`.
-- Footer content: edit `content/footer.plain.html` (or author the Footer block).
-- Then **preview + publish** the fragment path so every page picks it up:
+- Edit the nav/footer in the **language master**: `language-masters/{lang}/nav` and
+  `language-masters/{lang}/footer` (the footer can also be authored as the Footer
+  block). Keep the language-switcher entries as `NL` / `FR` / `EN`.
+- **Roll out** to `be/{lang}` (Live Copy Overview → Rollout, or a Blueprint
+  configuration for a Rollout button on the master pages).
+- **Publish** `be/{lang}/nav` and `be/{lang}/footer` so every page in that locale picks
+  them up. Do not publish the language-master pages. From the command line:
 ```bash
-curl -X POST "https://admin.hlx.page/preview/sonuarun004/bnpparibasfortis-eds/main/nav"
-curl -X POST "https://admin.hlx.page/live/sonuarun004/bnpparibasfortis-eds/main/nav"
-# same for /footer
+curl -X POST "https://admin.hlx.page/preview/sonuarun004/bnpparibasfortis-eds/main/be/nl/nav"
+curl -X POST "https://admin.hlx.page/live/sonuarun004/bnpparibasfortis-eds/main/be/nl/nav"
+# same for /be/{nl,fr,en}/{nav,footer}
 ```
+- `/be/nl/nav` and `/be/nl/footer` are the fallback for every locale and for pages
+  without a locale (404 page) — they must always be published.
 (Credentials are injected automatically when the Adobe opt-in is enabled — never
 paste a token.)
 

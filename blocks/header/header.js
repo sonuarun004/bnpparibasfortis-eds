@@ -2,26 +2,19 @@
 // builds a two-row header: a utility bar (logo, audience, search/contact,
 // language) and a main navigation bar with click-triggered megamenu panels.
 
-import { LANGUAGES, getLocale, localeUrl } from '../../scripts/scripts.js';
+import {
+  LANGUAGES, getLocale, localeUrl, fetchLocaleFragment,
+} from '../../scripts/scripts.js';
 
 const DESKTOP = window.matchMedia('(min-width: 900px)');
 
 /**
- * Fetch the nav fragment. A locale's own nav (/{lang}/nav, e.g. the Live Copy
- * under /be/fr) wins; otherwise fall back to the shared root fragment
- * (metadata-independent dual-fetch: /content/nav.plain.html, then /nav.plain.html).
+ * Fetch the nav fragment: the page locale's own nav (e.g. /be/fr/nav), falling
+ * back to the default locale's nav (/be/nl/nav).
  * @returns {Promise<Document|null>}
  */
-async function fetchNavDocument() {
-  const locale = getLocale();
-  let resp = locale.matched
-    ? await fetch(`${locale.base}/${locale.language}/nav.plain.html`)
-    : { ok: false };
-  if (!resp.ok) resp = await fetch('/content/nav.plain.html');
-  if (!resp.ok) resp = await fetch('/nav.plain.html');
-  if (!resp.ok) return null;
-  const html = await resp.text();
-  return new DOMParser().parseFromString(html, 'text/html');
+function fetchNavDocument() {
+  return fetchLocaleFragment('nav');
 }
 
 /**
