@@ -1,11 +1,14 @@
 {
   "mappings": [
-    "/content/bnpparibasfortis/:/",
+    "/content/bnpparibasfortis/be/:/",
     "/content/bnpparibasfortis/redirects:/redirects.json",
     "/content/bnpparibasfortis/configuration:/.helix/config.json",
     "/content/bnpparibasfortis/metadata:/metadata.json"
   ],
   "includes": [
-    "/content/bnpparibasfortis/"
+    "/content/bnpparibasfortis/be/",
+    "/content/bnpparibasfortis/redirects",
+    "/content/bnpparibasfortis/configuration",
+    "/content/bnpparibasfortis/metadata"
   ]
 }

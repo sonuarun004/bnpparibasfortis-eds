@@ -86,8 +86,11 @@ export function localeUrl(language, locale = getLocale()) {
   return `${locale.base}/${language}${locale.rest}`;
 }
 
-/** Locale whose nav/footer is used when a page has no locale of its own. */
-export const DEFAULT_LOCALE_ROOT = '/be/nl';
+/**
+ * Locale whose nav/footer is used for pages without a locale (e.g. the 404
+ * page). The BE country root is the domain root, so the default is /nl.
+ */
+export const DEFAULT_LOCALE_ROOT = `/${LANGUAGES[0]}`;
 
 /**
  * Fetch the first URL that responds OK.
@@ -102,14 +105,21 @@ async function fetchFirst(urls) {
 
 /**
  * Fetch a global fragment (nav, footer) for the current page: the page's own
- * locale first (e.g. /be/fr/nav), then the default locale (/be/nl/nav).
+ * locale first (e.g. /fr/nav), then the default language under the same prefix
+ * (/nl/nav), then DEFAULT_LOCALE_ROOT (covers pages without a locale and the
+ * local dev server, where pages sit under /content/be/...).
  * @param {string} name fragment name, e.g. 'nav'
  * @returns {Promise<Document|null>}
  */
 export async function fetchLocaleFragment(name) {
   const locale = getLocale();
   const urls = [`${DEFAULT_LOCALE_ROOT}/${name}.plain.html`];
-  if (locale.matched) urls.unshift(`${locale.base}/${locale.language}/${name}.plain.html`);
+  if (locale.matched) {
+    urls.unshift(
+      `${locale.base}/${locale.language}/${name}.plain.html`,
+      `${locale.base}/${LANGUAGES[0]}/${name}.plain.html`,
+    );
+  }
   const resp = await fetchFirst([...new Set(urls)]);
   if (!resp) return null;
   return new DOMParser().parseFromString(await resp.text(), 'text/html');

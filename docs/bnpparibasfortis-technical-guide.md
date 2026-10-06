@@ -27,9 +27,11 @@ npx -y @adobe/aem-cli up --no-open --html-folder content --prefer-plain-html \
 ```
 Local content is served from `content/`; anything missing is proxied from `aem.page`.
 
-**Delivery mapping** (`paths.json`): the site root `/content/bnpparibasfortis/` maps
-to `/`, so an AEM path like `/content/bnpparibasfortis/be/nl/…/sponsoring` is
-delivered at `/be/nl/…/sponsoring`.
+**Delivery mapping** (`paths.json`): the **BE country root**
+`/content/bnpparibasfortis/be/` maps to `/`, so an AEM path like
+`/content/bnpparibasfortis/be/nl/…/sponsoring` is delivered at `/nl/…/sponsoring`
+(see §2.1). Only `be/**` plus the root `redirects`, `configuration` and `metadata`
+sheets are published; `language-masters/**` is never published.
 
 ---
 
@@ -65,11 +67,25 @@ language copies, the rollout config, and the `be/{nl,fr,en}` Live Copies, then
 publish. `helix-query.yaml` already excludes `/language-masters/**` from the public
 index/sitemap so blueprint pages aren't indexed.
 
-### 2.1 Domain mapping for the BE site (target setup)
+### 2.1 Domain mapping for the BE site
 
-Adobe's MSM pattern for Edge Delivery is **one aem.live site per MSM country site**,
-all sharing this Git repo ("repoless"). The BE domain is rooted at
-`/content/bnpparibasfortis/be`, so public URLs start with the language:
+The site `bnpparibasfortis-eds` **is the BE site**: its `paths.json` maps the BE
+country root to the domain root, so public URLs start with the language:
+
+```json
+"mappings": [
+  "/content/bnpparibasfortis/be/:/",
+  "/content/bnpparibasfortis/redirects:/redirects.json",
+  "/content/bnpparibasfortis/configuration:/.helix/config.json",
+  "/content/bnpparibasfortis/metadata:/metadata.json"
+],
+"includes": [ "/content/bnpparibasfortis/be/", "/content/bnpparibasfortis/redirects",
+  "/content/bnpparibasfortis/configuration", "/content/bnpparibasfortis/metadata" ]
+```
+
+AEM reads `paths.json` from the `main` branch when it publishes, so a mapping change
+only takes effect for pages **published after** it is merged; already-published URLs
+stay until they are unpublished or redirected.
 
 | AEM path | Public URL on `www.bnpparibasfortis.be` |
 |----------|------------------------------------------|
@@ -78,22 +94,14 @@ all sharing this Git repo ("repoless"). The BE domain is rooted at
 | `/content/bnpparibasfortis/be/en/…` | `/en/…` |
 | `/content/bnpparibasfortis/language-masters/**` | not published |
 
-Setup (admin rights required; see `docs/msm-setup-runbook.md` Part C):
-1. Enable repoless for the project (one-time).
-2. Create the aem.live site `bnpparibasfortis-be` via the configuration service,
-   same code repo, content source `…/bin/franklin.delivery/sonuarun004/bnpparibasfortis-be/main`.
-3. Path mapping for that site: mappings `"/content/bnpparibasfortis/be/:/"`,
-   includes `"/content/bnpparibasfortis/be/"`.
-4. AEM author: create `/conf/bnpparibasfortis/be`, assign it to
-   `/content/bnpparibasfortis/be`, and add an Edge Delivery Services cloud config
-   for site `bnpparibasfortis-be` (type "aem.live with repoless config").
-5. Redirect the domain root with a redirects sheet at
-   `/content/bnpparibasfortis/be/redirects`: Source `/` → Destination `/nl/`
-   (or the sponsoring page until a `/nl/` home page exists). Test on `.aem.page`.
-6. CDN: point `www.bnpparibasfortis.be` at `main--bnpparibasfortis-be--sonuarun004.aem.live`.
+The domain root `/` redirects via the `redirects` sheet at
+`/content/bnpparibasfortis/redirects` (Source `/` → Destination `/nl/…`). The CDN
+points `www.bnpparibasfortis.be` at `main--bnpparibasfortis-eds--sonuarun004.aem.live`.
 
-Another country later (e.g. `lu`) = another site `bnpparibasfortis-lu` mapped to
-`/content/bnpparibasfortis/lu/:/`, same code.
+**Another country later** (e.g. `lu`) follows Adobe's MSM pattern of one aem.live
+site per country site sharing this repo ("repoless"): a new site
+`bnpparibasfortis-lu` mapped to `/content/bnpparibasfortis/lu/:/`, same code. Steps
+(admin rights required) are in `docs/msm-setup-runbook.md` Part C.
 
 ### 2.2 Locale handling in code
 
@@ -107,10 +115,10 @@ first = default). It works on every URL shape: `/nl/…` (BE site), `/be/nl/…`
   the current one is marked `aria-current`,
 - the header logo link (current locale's home, `/{lang}/`),
 - per-locale nav/footer: `fetchLocaleFragment()` loads the page locale's own
-  `/{lang}/nav` and `/{lang}/footer` (the Live Copies under `be/{lang}`) and falls
-  back to the **default locale** `DEFAULT_LOCALE_ROOT = '/be/nl'` (`/be/nl/nav`,
-  `/be/nl/footer`). Pages without a locale (e.g. the 404 page) use the default
-  locale directly. The old root `/nav` and `/footer` are no longer used.
+  `/{lang}/nav` and `/{lang}/footer` (the Live Copies under `be/{lang}`), then the
+  default language under the same prefix (`/nl/nav`), then
+  `DEFAULT_LOCALE_ROOT = '/nl'` (pages without a locale such as the 404 page, and
+  the local dev server). The old root `/nav` and `/footer` are no longer used.
 
 The nav fragment's language list only needs the language codes as link text
 (`NL` / `FR` / `EN`); its hrefs (`/nl/`, `/fr/`, `/en/`) are fallbacks for pages
@@ -153,12 +161,12 @@ The header and footer are **global**, edited once and shown on every page. They
 are decorated by `blocks/header/header.js` and `blocks/footer/footer.js`.
 
 - **Header** — content-first **fragment**. `header.js` fetches the locale's
-  `/{lang}/nav.plain.html`, falling back to the default locale's `/be/nl/nav.plain.html`
+  `/{lang}/nav.plain.html`, falling back to the default locale's `/nl/nav.plain.html`
   (see §2.2), and builds the utility bar (logo, audience tabs, search, language
   switcher) + main nav with click megamenus.
 - **Footer** — **hybrid**. `footer.js` decorates an authored **Footer block** when
   present (Universal-Editor editable), and otherwise fetches the locale's
-  `/{lang}/footer` fragment, falling back to `/be/nl/footer`. See §4.3.
+  `/{lang}/footer` fragment, falling back to `/nl/footer`. See §4.3.
 
 The nav and footer are pages in the MSM tree: authored in
 `language-masters/{lang}/nav|footer`, rolled out to `be/{lang}/nav|footer` (Live
@@ -222,12 +230,12 @@ appear once). Guard: `isFragmentPage()` in `scripts/scripts.js`.
 - **Publish** `be/{lang}/nav` and `be/{lang}/footer` so every page in that locale picks
   them up. Do not publish the language-master pages. From the command line:
 ```bash
-curl -X POST "https://admin.hlx.page/preview/sonuarun004/bnpparibasfortis-eds/main/be/nl/nav"
-curl -X POST "https://admin.hlx.page/live/sonuarun004/bnpparibasfortis-eds/main/be/nl/nav"
-# same for /be/{nl,fr,en}/{nav,footer}
+curl -X POST "https://admin.hlx.page/preview/sonuarun004/bnpparibasfortis-eds/main/nl/nav"
+curl -X POST "https://admin.hlx.page/live/sonuarun004/bnpparibasfortis-eds/main/nl/nav"
+# same for /{nl,fr,en}/{nav,footer}  (AEM page be/{lang}/… is delivered at /{lang}/…)
 ```
-- `/be/nl/nav` and `/be/nl/footer` are the fallback for every locale and for pages
-  without a locale (404 page) — they must always be published.
+- `/nl/nav` and `/nl/footer` (AEM `be/nl/nav|footer`) are the fallback for every
+  locale and for pages without a locale (404 page) — they must always be published.
 (Credentials are injected automatically when the Adobe opt-in is enabled — never
 paste a token.)
 
