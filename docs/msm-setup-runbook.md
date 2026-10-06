@@ -192,11 +192,14 @@ CDN (Adobe Managed or BYO CDN).
 
 ### C7. Per-locale nav/footer
 The code fetches `/{lang}/nav` and `/{lang}/footer` first and falls back to the default
-locale (`/be/nl/nav`, `/be/nl/footer`; `DEFAULT_LOCALE_ROOT` in `scripts/scripts.js`).
+language (`/nl/nav`, `/nl/footer`; `DEFAULT_LOCALE_ROOT` in `scripts/scripts.js`).
 Author them in `language-masters/{lang}/`, roll out to `be/{lang}/`, publish there. The
-old root `/content/bnpparibasfortis/nav` and `footer` are not used and can be deleted once
-`be/nl/nav` and `be/nl/footer` are live. After the BE site moves to the domain root,
-change `DEFAULT_LOCALE_ROOT` to `/nl`.
+old root `/content/bnpparibasfortis/nav` and `footer` are not used and can be deleted.
+
+> **Current setup:** rather than a separate `bnpparibasfortis-be` site, the existing site
+> `bnpparibasfortis-eds` was made the BE site by changing its `paths.json` mapping to
+> `/content/bnpparibasfortis/be/:/` (see technical guide §2.1). Part C applies to the
+> *next* country.
 
 ### Resulting URLs
 
