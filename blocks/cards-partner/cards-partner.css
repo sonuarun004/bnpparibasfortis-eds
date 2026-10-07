@@ -74,7 +74,7 @@
 }
 
 .cards-partner .cards-partner-card-body a {
-  color: rgb(0 150 94);
+  color: var(--link-color);
 }
 
 /* ---- tablet: 2-up ---- */

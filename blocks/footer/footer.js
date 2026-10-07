@@ -46,17 +46,53 @@ function buildCardstopIcon() {
   return icon;
 }
 
+/** Hosts whose links make a list the footer's social links. */
+const SOCIAL_HOSTS = ['facebook.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'x.com', 'twitter.com', 'tiktok.com'];
+
+/**
+ * Whether every link in a list points to a social network.
+ * @param {Element|null} ul
+ * @returns {boolean}
+ */
+function isSocialList(ul) {
+  const links = ul ? [...ul.querySelectorAll('a[href]')] : [];
+  return links.length > 0 && links.every((a) => {
+    try {
+      const host = new URL(a.getAttribute('href'), window.location.href).hostname.replace(/^www\./, '');
+      return SOCIAL_HOSTS.some((s) => host === s || host.endsWith(`.${s}`));
+    } catch (e) {
+      return false;
+    }
+  });
+}
+
+/**
+ * Build the social links list (external, opens in a new tab).
+ * @param {Element} ul source list
+ * @returns {Element}
+ */
+function buildSocial(ul) {
+  const list = ul.cloneNode(true);
+  list.className = 'footer-social';
+  list.querySelectorAll('a').forEach((a) => {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  });
+  return list;
+}
+
 /**
  * Assemble the footer inner regions from already-extracted parts.
  * @param {object} parts
  * @param {Array<{heading: string, links: Element|null}>} parts.columns
  * @param {Element|null} parts.cardstopText  paragraph(s) wrapper for label+phone
  * @param {Element|null} parts.legalLinks    <ul> of legal links
+ * @param {Element|null} parts.socialLinks   <ul> of social network links
  * @param {Element|null} parts.copyright     copyright content wrapper
  * @returns {Element}
  */
 function buildFooterInner({
-  columns, cardstopText, legalLinks, copyright,
+  columns, cardstopText, legalLinks, socialLinks, copyright,
 }) {
   const inner = document.createElement('div');
   inner.className = 'footer-inner';
@@ -103,8 +139,8 @@ function buildFooterInner({
     inner.append(region);
   }
 
-  // Region 3: copyright (brand logo + text)
-  if (copyright) {
+  // Region 3: copyright bar (brand logo, social links, copyright text)
+  if (copyright || socialLinks) {
     const region = document.createElement('div');
     region.className = 'footer-copyright';
 
@@ -116,12 +152,16 @@ function buildFooterInner({
     logo.width = 164;
     logo.height = 34;
     brand.append(logo);
+    region.append(brand);
 
-    const text = document.createElement('div');
-    text.className = 'footer-copyright-text';
-    text.append(copyright);
+    if (socialLinks) region.append(buildSocial(socialLinks));
 
-    region.append(brand, text);
+    if (copyright) {
+      const text = document.createElement('div');
+      text.className = 'footer-copyright-text';
+      text.append(copyright);
+      region.append(text);
+    }
     inner.append(region);
   }
 
@@ -148,6 +188,11 @@ function partsFromFragment(sections) {
     });
   }
 
+  // A list of social network links may sit in the legal or copyright section.
+  const socialLinks = sections.slice(1)
+    .flatMap((s) => [...s.querySelectorAll(':scope > ul')])
+    .find(isSocialList) || null;
+
   const legalSection = sections[1];
   let cardstopText = null;
   let legalLinks = null;
@@ -159,7 +204,7 @@ function partsFromFragment(sections) {
       }
     });
     if (textWrap.childElementCount) cardstopText = textWrap;
-    const ul = legalSection.querySelector('ul');
+    const ul = [...legalSection.querySelectorAll(':scope > ul')].find((u) => u !== socialLinks);
     if (ul) legalLinks = ul.cloneNode(true);
   }
 
@@ -168,6 +213,7 @@ function partsFromFragment(sections) {
   if (copyrightSection) {
     const wrap = document.createElement('div');
     [...copyrightSection.children].forEach((el) => {
+      if (el === socialLinks) return;
       if (!(el.tagName === 'P' && el.querySelector('img') && !el.textContent.trim())) {
         wrap.append(el.cloneNode(true));
       }
@@ -176,7 +222,7 @@ function partsFromFragment(sections) {
   }
 
   return {
-    columns, cardstopText, legalLinks, copyright,
+    columns, cardstopText, legalLinks, socialLinks, copyright,
   };
 }
 
@@ -192,6 +238,7 @@ function partsFromBlock(block) {
   const columns = [];
   let cardstopText = null;
   let legalLinks = null;
+  let socialLinks = null;
   let copyright = null;
 
   [...block.children].forEach((row) => {
@@ -214,6 +261,9 @@ function partsFromBlock(block) {
       const wrap = document.createElement('div');
       [...cell.children].forEach((el) => wrap.append(el.cloneNode(true)));
       cardstopText = wrap;
+    } else if (ul && isSocialList(ul)) {
+      // Social network links.
+      socialLinks = ul;
     } else if (ul) {
       // Legal links list.
       legalLinks = ul.cloneNode(true);
@@ -226,7 +276,7 @@ function partsFromBlock(block) {
   });
 
   return {
-    columns, cardstopText, legalLinks, copyright,
+    columns, cardstopText, legalLinks, socialLinks, copyright,
   };
 }
 

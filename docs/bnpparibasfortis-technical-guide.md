@@ -83,9 +83,15 @@ country root to the domain root, so public URLs start with the language:
   "/content/bnpparibasfortis/configuration", "/content/bnpparibasfortis/metadata" ]
 ```
 
-AEM reads `paths.json` from the `main` branch when it publishes, so a mapping change
-only takes effect for pages **published after** it is merged; already-published URLs
-stay until they are unpublished or redirected.
+**Where the mapping lives:** this site is managed by the configuration service, so
+AEM takes the mapping from the site's **public config**
+(`https://admin.hlx.page/config/sonuarun004/sites/bnpparibasfortis-eds/public.json`,
+visible at `/config.json`), not from the repo. Changing only the repo's `paths.json`
+had no effect (AEM kept the old mapping); `paths.json` is kept identical for reference.
+Change the mapping in `public.json` (cURL or https://tools.aem.live/tools/admin-edit/).
+
+A mapping change only takes effect for pages **published after** it; already-published
+URLs stay until they are unpublished or redirected.
 
 | AEM path | Public URL on `www.bnpparibasfortis.be` |
 |----------|------------------------------------------|

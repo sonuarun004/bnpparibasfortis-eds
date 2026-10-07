@@ -53,6 +53,13 @@
         {
           "component": "richtext",
           "valueType": "string",
+          "name": "social",
+          "label": "Social links (list of Facebook, Instagram, LinkedIn, YouTube… links)",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
           "name": "copyright",
           "label": "Copyright",
           "value": ""

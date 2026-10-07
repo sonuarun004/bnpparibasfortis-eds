@@ -7,8 +7,11 @@
   /* Colors */
   --background-color: rgb(241 242 246);
   --text-color: rgb(51 51 51);
-  --link-color: rgb(0 150 94);
-  --link-hover-color: rgb(0 120 75);
+
+  /* Link green darkened from the brand #00965e (3.8:1 on white, 3.4:1 on the
+     grey page) to #00784b so link text meets WCAG AA 4.5:1 on both. */
+  --link-color: rgb(0 120 75);
+  --link-hover-color: rgb(0 92 57);
 
   /* Neutral surfaces */
   --surface-color: rgb(255 255 255);

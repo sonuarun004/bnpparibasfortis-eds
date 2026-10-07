@@ -157,6 +157,12 @@ a:hover {
   text-decoration: underline;
 }
 
+/* links inside running text are underlined so they are not identified by
+   colour alone (WCAG 1.4.1) */
+main p a:any-link:not(.button) {
+  text-decoration: underline;
+}
+
 /* buttons */
 p.button-wrapper {
   margin: 12px 0;
@@ -327,4 +333,21 @@ main .default-content-wrapper {
 
 main .default-content-wrapper h1 {
   margin-bottom: 0.5em;
+}
+
+/* <main> receives focus from the skip link; no outline on the whole region */
+main:focus {
+  outline: none;
+}
+
+/* respect the user's reduced-motion preference (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
