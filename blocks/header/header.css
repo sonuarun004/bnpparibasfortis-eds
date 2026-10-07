@@ -27,7 +27,9 @@ header .skip-link:focus {
   top: 8px;
 }
 
-header .nav-wrapper {
+/* white bar across the full width (the page itself is grey); the logo SVG has
+   a white background, so it only blends in on white */
+header .header {
   background-color: #fff;
   width: 100%;
   z-index: 3;
@@ -334,21 +336,22 @@ header .nav-cta {
   white-space: nowrap;
 }
 
-header .nav-cta-outline {
+/* "header .nav a" would otherwise win and turn the CTA text grey */
+header .nav a.nav-cta-outline {
   border: 1px solid var(--link-color);
   color: var(--link-color);
 }
 
-header .nav-cta-primary {
+header .nav a.nav-cta-primary {
   background: var(--link-color);
   color: #fff;
 }
 
-header .nav-cta-primary:hover {
+header .nav a.nav-cta-primary:hover {
   background: var(--link-hover-color);
 }
 
-header .nav-cta-outline:hover {
+header .nav a.nav-cta-outline:hover {
   background: rgb(0 150 94 / 8%);
 }
 
