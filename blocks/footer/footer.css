@@ -100,6 +100,18 @@ footer .footer-legal-links a {
   font-size: 13px;
 }
 
+footer .footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+footer .footer-social a {
+  display: inline-block;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
 footer .footer-cardstop-text a:hover {
   color: #e2001a;
   text-decoration: underline;

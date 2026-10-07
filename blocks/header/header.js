@@ -8,6 +8,29 @@ import {
 
 const DESKTOP = window.matchMedia('(min-width: 900px)');
 
+const SKIP_LINK_LABELS = {
+  nl: 'Ga direct naar hoofdinhoud',
+  fr: 'Aller directement au contenu principal',
+  en: 'Skip to main content',
+};
+
+/**
+ * Build the "skip to main content" link (first focusable element on the page).
+ * Gives <main> an id and makes it focusable so the link moves focus there.
+ * @returns {Element|null}
+ */
+function buildSkipLink() {
+  const main = document.querySelector('main');
+  if (!main) return null;
+  if (!main.id) main.id = 'main';
+  main.setAttribute('tabindex', '-1');
+  const link = document.createElement('a');
+  link.className = 'skip-link';
+  link.href = `#${main.id}`;
+  link.textContent = SKIP_LINK_LABELS[getLocale().language] || SKIP_LINK_LABELS.en;
+  return link;
+}
+
 /**
  * Fetch the nav fragment: the page locale's own nav (e.g. /be/fr/nav), falling
  * back to the default locale's nav (/be/nl/nav).
@@ -357,6 +380,8 @@ export default async function decorate(block) {
     nav.append(mainNav);
   }
 
+  const skipLink = buildSkipLink();
+  if (skipLink) block.append(skipLink);
   block.append(nav);
 
   document.addEventListener('click', (e) => {
