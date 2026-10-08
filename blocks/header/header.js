@@ -3,11 +3,14 @@
 // language) and a main navigation bar with click-triggered megamenu panels.
 
 import {
-  LANGUAGES, getLocale, localeUrl, fetchLocaleFragment,
+  LANGUAGES, getLocale, localeUrl, fetchLocaleFragment, resolveSourceLinks,
 } from '../../scripts/scripts.js';
 
 // matches the source site, which switches to its compact mobile header below 1024px
 const DESKTOP = window.matchMedia('(min-width: 1024px)');
+
+// a menu column's "see all" link (the source's "viewMore" links), in NL/FR/EN
+const SEE_ALL = /^(al onze|alle|toutes nos|tous nos|tout notre|all our|all)\s/i;
 
 /**
  * Create a decorative icon (an SVG from /icons, painted with currentColor
@@ -237,13 +240,14 @@ function buildMainNav(section) {
           h.className = 'nav-col-heading';
           h.textContent = heading;
           const links = list.cloneNode(true);
-          // A bold link is the column's "see all" link (green, with a chevron)
+          // The column's "see all" link (green, with a chevron): a bold link,
+          // or one worded like "Al onze oplossingen" / "Alle sectoren"
           links.querySelectorAll('li').forEach((item) => {
             const strong = item.querySelector('strong');
             const a = item.querySelector('a');
-            if (!strong || !a) return;
-            strong.replaceWith(...strong.childNodes);
-            a.classList.add('nav-col-more');
+            if (!a) return;
+            if (strong) strong.replaceWith(...strong.childNodes);
+            if (strong || SEE_ALL.test(a.textContent.trim())) a.classList.add('nav-col-more');
           });
           col.append(h, links);
           inner.append(col);
@@ -517,6 +521,7 @@ export default async function decorate(block) {
   const skipLink = buildSkipLink();
   if (skipLink) block.append(skipLink);
   block.append(nav);
+  resolveSourceLinks(nav);
 
   document.addEventListener('click', (e) => {
     if (!nav.contains(e.target)) closeAllMenus(nav);

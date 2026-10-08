@@ -92,6 +92,63 @@ export function localeUrl(language, locale = getLocale()) {
  */
 export const DEFAULT_LOCALE_ROOT = `/${LANGUAGES[0]}`;
 
+/** The site being migrated; pages not migrated yet are still served there. */
+export const SOURCE_ORIGIN = 'https://www.bnpparibasfortis.be';
+
+let migratedPages;
+
+/**
+ * Paths of the pages published on this site, from the query index.
+ * @returns {Promise<Set<string>>}
+ */
+function fetchMigratedPages() {
+  if (!migratedPages) {
+    migratedPages = fetch('/query-index.json')
+      .then((resp) => (resp.ok ? resp.json() : { data: [] }))
+      .then(({ data = [] }) => new Set(data.map(({ path }) => path)))
+      .catch(() => new Set());
+  }
+  return migratedPages;
+}
+
+/**
+ * Point links that use the source site's paths (e.g. authored nav/footer links
+ * like /nl/public/particulieren/...) at the right page: our migrated page when
+ * it exists (same path without /public), otherwise the page on the source site.
+ * @param {Element} container
+ */
+export async function resolveSourceLinks(container) {
+  const pages = await fetchMigratedPages();
+  container.querySelectorAll('a[href]').forEach((a) => {
+    const href = a.getAttribute('href');
+    let url;
+    try {
+      url = new URL(href, window.location.href);
+    } catch (e) {
+      return;
+    }
+    const isSource = url.origin === SOURCE_ORIGIN;
+    if (!isSource && (url.origin !== window.location.origin || !href.startsWith('/'))) return;
+    // a language home page we haven't migrated: the source site's home page
+    const home = url.pathname.match(/^\/([a-z]{2})\/?$/);
+    if (home && !isSource) {
+      if (LANGUAGES.includes(home[1]) && !pages.has(`/${home[1]}/`) && !pages.has(`/${home[1]}`)) {
+        a.href = `${SOURCE_ORIGIN}/`;
+      }
+      return;
+    }
+    const match = url.pathname.match(/^\/([a-z]{2})\/(public|generic)(\/.*)?$/);
+    if (!match || !LANGUAGES.includes(match[1])) return;
+    const [, language, area, rest = ''] = match;
+    const localPath = `/${language}${rest}`.replace(/\/$/, '');
+    if (area === 'public' && pages.has(localPath)) {
+      a.href = `${localPath}${url.search}${url.hash}`;
+    } else if (!isSource) {
+      a.href = `${SOURCE_ORIGIN}${url.pathname}${url.search}${url.hash}`;
+    }
+  });
+}
+
 /**
  * Fetch the first URL that responds OK.
  * @param {string[]} urls
