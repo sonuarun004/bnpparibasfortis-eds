@@ -46,6 +46,13 @@ const SKIP_LINK_LABELS = {
   en: 'Skip to main content',
 };
 
+// label of the mobile sub-menu's back button (the source uses "Retour" in NL)
+const BACK_LABELS = {
+  nl: 'Retour',
+  fr: 'Retour',
+  en: 'Back',
+};
+
 /**
  * Build the "skip to main content" link (first focusable element on the page).
  * Gives <main> an id and makes it focusable so the link moves focus there.
@@ -123,6 +130,9 @@ function closeAllMenus(navBar) {
     const menu = btn.nextElementSibling;
     if (menu && menu.classList.contains('nav-lang-menu')) menu.hidden = true;
   });
+  navBar.querySelectorAll('.nav-audience-toggle[aria-expanded="true"]').forEach((btn) => {
+    btn.setAttribute('aria-expanded', 'false');
+  });
 }
 
 /**
@@ -198,6 +208,26 @@ function buildMainNav(section) {
         const panel = document.createElement('div');
         panel.className = 'nav-panel';
         panel.hidden = true;
+
+        // mobile only: the sub-menu covers the menu, with a back button and title
+        const head = document.createElement('div');
+        head.className = 'nav-panel-head';
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'nav-panel-back';
+        back.textContent = BACK_LABELS[getLocale().language] || BACK_LABELS.en;
+        back.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btn.setAttribute('aria-expanded', 'false');
+          panel.hidden = true;
+          btn.focus();
+        });
+        const title = document.createElement('p');
+        title.className = 'nav-panel-title';
+        title.textContent = label;
+        head.append(back, title);
+        panel.append(head);
+
         const inner = document.createElement('div');
         inner.className = 'nav-panel-inner';
         columns.forEach(({ heading, list }) => {
@@ -292,19 +322,48 @@ function buildUtilityBar(section) {
   const link = document.createElement('a');
   if (locale.matched) link.href = `${locale.base}/${locale.language}/`;
   else link.href = brandLink ? brandLink.getAttribute('href') : '/';
+  // the mobile header shows only the square logo mark, as on the source
+  const picture = document.createElement('picture');
+  const desktopLogo = document.createElement('source');
+  desktopLogo.media = '(min-width: 1024px)';
+  desktopLogo.srcset = '/icons/bnppf-logo.svg';
+  desktopLogo.width = 155;
+  desktopLogo.height = 32;
   const logo = document.createElement('img');
-  logo.src = '/icons/bnppf-logo.svg';
+  logo.src = '/icons/bnppf-logo-mark.svg';
   logo.alt = 'BNP Paribas Fortis';
   logo.className = 'nav-logo';
-  logo.width = 155;
-  logo.height = 32;
-  link.append(logo);
+  logo.width = 24;
+  logo.height = 24;
+  picture.append(desktopLogo, logo);
+  link.append(picture);
   brand.append(link);
 
   const audience = document.createElement('ul');
   audience.className = 'nav-audience';
+  audience.id = 'nav-audience';
   if (lists[0]) audience.innerHTML = lists[0].innerHTML;
   markActiveAudience(audience);
+
+  // mobile only: the audiences collapse into a dropdown named after the active one
+  const audienceWrap = document.createElement('div');
+  audienceWrap.className = 'nav-audience-wrap';
+  const activeAudience = audience.querySelector('a.active');
+  if (activeAudience) {
+    const audienceToggle = document.createElement('button');
+    audienceToggle.type = 'button';
+    audienceToggle.className = 'nav-audience-toggle';
+    audienceToggle.setAttribute('aria-expanded', 'false');
+    audienceToggle.setAttribute('aria-controls', audience.id);
+    audienceToggle.textContent = activeAudience.textContent.trim();
+    audienceToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = audienceToggle.getAttribute('aria-expanded') === 'true';
+      audienceToggle.setAttribute('aria-expanded', String(!open));
+    });
+    audienceWrap.append(audienceToggle);
+  }
+  audienceWrap.append(audience);
 
   // Utility tools list (e.g. Zoeken, Contacteer ons). The search entry is
   // pulled out and re-rendered as an icon button on the far right.
@@ -377,7 +436,7 @@ function buildUtilityBar(section) {
 
   const left = document.createElement('div');
   left.className = 'nav-utility-left';
-  left.append(brand, audience);
+  left.append(brand, audienceWrap);
 
   const right = document.createElement('div');
   right.className = 'nav-utility-right';
@@ -412,18 +471,46 @@ export default async function decorate(block) {
   hamburger.className = 'nav-hamburger';
   hamburger.setAttribute('aria-label', 'Menu');
   hamburger.setAttribute('aria-expanded', 'false');
-  hamburger.innerHTML = '<span class="nav-hamburger-icon"></span>';
+  hamburger.append(buildIcon('menu'), buildIcon('close'));
 
   let mainNav = null;
+  const setDrawer = (open) => {
+    hamburger.setAttribute('aria-expanded', String(open));
+    if (!mainNav) return;
+    mainNav.classList.toggle('nav-main-open', open);
+    // the page behind the full-screen menu doesn't scroll
+    document.body.style.overflowY = open && !DESKTOP.matches ? 'hidden' : '';
+  };
   if (mainSection) {
     mainNav = buildMainNav(mainSection);
+    mainNav.id = 'nav-main';
+    hamburger.setAttribute('aria-controls', mainNav.id);
     hamburger.addEventListener('click', () => {
-      const open = hamburger.getAttribute('aria-expanded') === 'true';
-      hamburger.setAttribute('aria-expanded', String(!open));
-      mainNav.classList.toggle('nav-main-open', !open);
+      closeAllMenus(nav);
+      setDrawer(hamburger.getAttribute('aria-expanded') !== 'true');
     });
     const uRight = nav.querySelector('.nav-utility-right');
     if (uRight) uRight.append(hamburger);
+
+    // mobile only: the menu repeats the contact link and the language links
+    const contact = nav.querySelector('.nav-utility-tools a');
+    if (contact) {
+      const li = document.createElement('li');
+      li.className = 'nav-menu-item nav-menu-item-contact';
+      li.append(contact.cloneNode(true));
+      mainNav.querySelector('.nav-menu-list').append(li);
+    }
+    const langLinks = [...nav.querySelectorAll('.nav-lang-menu a')];
+    if (langLinks.length) {
+      const langs = document.createElement('ul');
+      langs.className = 'nav-drawer-lang';
+      langLinks.forEach((a) => {
+        const li = document.createElement('li');
+        li.append(a.cloneNode(true));
+        langs.append(li);
+      });
+      mainNav.append(langs);
+    }
     nav.append(mainNav);
   }
 
@@ -435,12 +522,18 @@ export default async function decorate(block) {
     if (!nav.contains(e.target)) closeAllMenus(nav);
   });
   document.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape') closeAllMenus(nav);
+    if (e.code !== 'Escape') return;
+    // Escape closes an open sub-menu first, then the mobile menu itself
+    const subMenuOpen = nav.querySelector('[aria-expanded="true"]:not(.nav-hamburger)');
+    closeAllMenus(nav);
+    if (!subMenuOpen && hamburger.getAttribute('aria-expanded') === 'true') {
+      setDrawer(false);
+      hamburger.focus();
+    }
   });
 
   DESKTOP.addEventListener('change', () => {
     closeAllMenus(nav);
-    hamburger.setAttribute('aria-expanded', 'false');
-    if (mainNav) mainNav.classList.remove('nav-main-open');
+    setDrawer(false);
   });
 }
