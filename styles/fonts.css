@@ -20,6 +20,16 @@
        local('BNPPSansLight');
 }
 
+/* BNPP Slab Serif (regular), used for the "Private Banking" header link */
+@font-face {
+  font-family: bnppslabserif;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/bnppslabserif-regular.woff2') format('woff2'),
+       local('BNPPSlabSerif');
+}
+
 @font-face {
   font-family: roboto-condensed;
   font-style: normal;
