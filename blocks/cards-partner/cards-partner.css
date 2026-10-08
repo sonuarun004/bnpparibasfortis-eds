@@ -82,12 +82,6 @@
   color: var(--text-color);
 }
 
-/* links: the source's regular weight; colour from --link-color (WCAG AA) */
-.cards-partner .cards-partner-card-body a:any-link {
-  font-family: var(--heading-font-family);
-  color: var(--link-color);
-}
-
 /* ---- from 768px: bordered cards, three per row ---- */
 @media (width >= 768px) {
   .cards-partner > ul {
