@@ -12,6 +12,9 @@ import { fetchLocaleFragment } from '../../scripts/scripts.js';
 const CARDSTOP_ICON = '/icons/stopcard.png';
 const COPYRIGHT_LOGO = '/icons/bnppf-logo.svg';
 
+// below this width the link columns collapse into an accordion (as on the source)
+const COLUMNS_DESKTOP = window.matchMedia('(min-width: 768px)');
+
 /**
  * Fetch the footer fragment: the page locale's own footer (e.g. /be/fr/footer),
  * falling back to the default locale's footer (/be/nl/footer).
@@ -41,9 +44,57 @@ function buildCardstopIcon() {
   icon.src = CARDSTOP_ICON;
   icon.alt = 'Card Stop';
   icon.className = 'footer-cardstop-icon';
-  icon.width = 102;
-  icon.height = 102;
+  icon.width = 66;
+  icon.height = 65;
   return icon;
+}
+
+/**
+ * Build the mobile Card Stop call button (the source shows a full-width red
+ * "call" button instead of the large text on small screens).
+ * @param {Element} cardstopText wrapper holding the label paragraph + tel link
+ * @returns {Element|null}
+ */
+function buildCardstopButton(cardstopText) {
+  const tel = cardstopText.querySelector('a[href^="tel:"]');
+  if (!tel) return null;
+  const label = cardstopText.textContent.replace(tel.textContent, '').replace(/\s+/g, ' ').trim();
+  const btn = document.createElement('a');
+  btn.className = 'footer-cardstop-btn';
+  btn.href = tel.getAttribute('href');
+  const icon = document.createElement('span');
+  icon.className = 'footer-cardstop-btn-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  const text = document.createElement('span');
+  text.textContent = label || tel.textContent.trim();
+  btn.append(icon, text);
+  return btn;
+}
+
+/**
+ * Make the column headings toggles for the mobile accordion. From 768px all
+ * columns are open and the toggle does nothing.
+ * @param {Element} region the .footer-columns element
+ */
+function setupColumnAccordion(region) {
+  const toggles = [...region.querySelectorAll('.footer-col-toggle')];
+  const sync = () => {
+    toggles.forEach((btn) => {
+      const list = btn.closest('.footer-col').querySelector('.footer-col-links');
+      const open = COLUMNS_DESKTOP.matches || btn.dataset.open === 'true';
+      btn.setAttribute('aria-expanded', String(open));
+      if (list) list.hidden = !open;
+    });
+  };
+  toggles.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (COLUMNS_DESKTOP.matches) return;
+      btn.dataset.open = String(btn.dataset.open !== 'true');
+      sync();
+    });
+  });
+  COLUMNS_DESKTOP.addEventListener('change', sync);
+  sync();
 }
 
 /** Hosts whose links make a list the footer's social links. */
@@ -89,7 +140,7 @@ function buildSocial(ul) {
  * @param {Element|null} parts.legalLinks    <ul> of legal links
  * @param {Element|null} parts.socialLinks   <ul> of social network links
  * @param {Element|null} parts.copyright     copyright content wrapper
- * @returns {Element}
+ * @returns {Element[]} the main footer area and the copyright band
  */
 function buildFooterInner({
   columns, cardstopText, legalLinks, socialLinks, copyright,
@@ -101,18 +152,29 @@ function buildFooterInner({
   if (columns.length) {
     const region = document.createElement('div');
     region.className = 'footer-columns';
-    columns.forEach(({ heading, links }) => {
+    columns.forEach(({ heading, links }, i) => {
       const col = document.createElement('div');
       col.className = 'footer-col';
+      const listId = `footer-col-links-${i + 1}`;
       if (heading) {
         const h = document.createElement('p');
         h.className = 'footer-col-heading';
-        h.textContent = heading;
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'footer-col-toggle';
+        toggle.textContent = heading;
+        if (links) toggle.setAttribute('aria-controls', listId);
+        h.append(toggle);
         col.append(h);
       }
-      if (links) col.append(links);
+      if (links) {
+        links.classList.add('footer-col-links');
+        links.id = listId;
+        col.append(links);
+      }
       region.append(col);
     });
+    setupColumnAccordion(region);
     inner.append(region);
   }
 
@@ -129,20 +191,31 @@ function buildFooterInner({
       textWrap.className = 'footer-cardstop-text';
       textWrap.append(cardstopText);
       cardstop.append(textWrap);
+      const btn = buildCardstopButton(cardstopText);
+      if (btn) cardstop.append(btn);
     }
 
     const linksWrap = document.createElement('div');
     linksWrap.className = 'footer-legal-links';
-    if (legalLinks) linksWrap.append(legalLinks);
+    if (legalLinks) {
+      // two columns, filled top-to-bottom (rows = half the links, rounded up)
+      linksWrap.style.setProperty('--legal-rows', Math.ceil(legalLinks.children.length / 2));
+      linksWrap.append(legalLinks);
+    }
 
     region.append(cardstop, linksWrap);
     inner.append(region);
   }
 
-  // Region 3: copyright bar (brand logo, social links, copyright text)
+  // Region 3: copyright bar (brand logo, social links, copyright text) —
+  // a full-width white band, so it sits outside .footer-inner
+  const bands = [inner];
   if (copyright || socialLinks) {
+    const band = document.createElement('div');
+    band.className = 'footer-copyright-band';
     const region = document.createElement('div');
     region.className = 'footer-copyright';
+    band.append(region);
 
     const brand = document.createElement('div');
     brand.className = 'footer-copyright-brand';
@@ -162,10 +235,10 @@ function buildFooterInner({
       text.append(copyright);
       region.append(text);
     }
-    inner.append(region);
+    bands.push(band);
   }
 
-  return inner;
+  return bands;
 }
 
 /**
@@ -293,7 +366,7 @@ export default async function decorate(block) {
   if (hasAuthoredContent) {
     const parts = partsFromBlock(block);
     block.textContent = '';
-    block.append(buildFooterInner(parts));
+    block.append(...buildFooterInner(parts));
     return;
   }
 
@@ -307,5 +380,5 @@ export default async function decorate(block) {
   const parts = embedded
     ? partsFromBlock(embedded)
     : partsFromFragment(fragmentSections(doc));
-  block.append(buildFooterInner(parts));
+  block.append(...buildFooterInner(parts));
 }
