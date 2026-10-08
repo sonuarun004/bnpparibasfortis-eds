@@ -3,7 +3,7 @@
 // language) and a main navigation bar with click-triggered megamenu panels.
 
 import {
-  LANGUAGES, getLocale, localeUrl, fetchLocaleFragment, resolveSourceLinks,
+  LANGUAGES, getLocale, localeUrl, fetchLocaleFragment, localizeSourceLinks,
 } from '../../scripts/scripts.js';
 
 // matches the source site, which switches to its compact mobile header below 1024px
@@ -521,7 +521,7 @@ export default async function decorate(block) {
   const skipLink = buildSkipLink();
   if (skipLink) block.append(skipLink);
   block.append(nav);
-  resolveSourceLinks(nav);
+  localizeSourceLinks(nav);
 
   document.addEventListener('click', (e) => {
     if (!nav.contains(e.target)) closeAllMenus(nav);

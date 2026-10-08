@@ -92,33 +92,18 @@ export function localeUrl(language, locale = getLocale()) {
  */
 export const DEFAULT_LOCALE_ROOT = `/${LANGUAGES[0]}`;
 
-/** The site being migrated; pages not migrated yet are still served there. */
-export const SOURCE_ORIGIN = 'https://www.bnpparibasfortis.be';
-
-let migratedPages;
+/** Hosts of the site being migrated; links to them become relative links. */
+const SOURCE_HOSTS = ['www.bnpparibasfortis.be', 'bnpparibasfortis.be'];
 
 /**
- * Paths of the pages published on this site, from the query index.
- * @returns {Promise<Set<string>>}
- */
-function fetchMigratedPages() {
-  if (!migratedPages) {
-    migratedPages = fetch('/query-index.json')
-      .then((resp) => (resp.ok ? resp.json() : { data: [] }))
-      .then(({ data = [] }) => new Set(data.map(({ path }) => path)))
-      .catch(() => new Set());
-  }
-  return migratedPages;
-}
-
-/**
- * Point links that use the source site's paths (e.g. authored nav/footer links
- * like /nl/public/particulieren/...) at the right page: our migrated page when
- * it exists (same path without /public), otherwise the page on the source site.
+ * Make links to the source site relative and map them onto this site's
+ * structure, which drops the source's /public segment:
+ *   https://www.bnpparibasfortis.be/nl/public/ondernemingen becomes /nl/ondernemingen
+ *   /nl/public/particulieren/lenen becomes /nl/particulieren/lenen
+ * Links to other domains are left as they are.
  * @param {Element} container
  */
-export async function resolveSourceLinks(container) {
-  const pages = await fetchMigratedPages();
+export function localizeSourceLinks(container) {
   container.querySelectorAll('a[href]').forEach((a) => {
     const href = a.getAttribute('href');
     let url;
@@ -127,25 +112,12 @@ export async function resolveSourceLinks(container) {
     } catch (e) {
       return;
     }
-    const isSource = url.origin === SOURCE_ORIGIN;
-    if (!isSource && (url.origin !== window.location.origin || !href.startsWith('/'))) return;
-    // a language home page we haven't migrated: the source site's home page
-    const home = url.pathname.match(/^\/([a-z]{2})\/?$/);
-    if (home && !isSource) {
-      if (LANGUAGES.includes(home[1]) && !pages.has(`/${home[1]}/`) && !pages.has(`/${home[1]}`)) {
-        a.href = `${SOURCE_ORIGIN}/`;
-      }
-      return;
-    }
-    const match = url.pathname.match(/^\/([a-z]{2})\/(public|generic)(\/.*)?$/);
-    if (!match || !LANGUAGES.includes(match[1])) return;
-    const [, language, area, rest = ''] = match;
-    const localPath = `/${language}${rest}`.replace(/\/$/, '');
-    if (area === 'public' && pages.has(localPath)) {
-      a.href = `${localPath}${url.search}${url.hash}`;
-    } else if (!isSource) {
-      a.href = `${SOURCE_ORIGIN}${url.pathname}${url.search}${url.hash}`;
-    }
+    const isSource = SOURCE_HOSTS.includes(url.hostname);
+    if (!isSource && !(href.startsWith('/') && !href.startsWith('//'))) return;
+    const path = url.pathname.replace(/^\/([a-z]{2})\/public(?=\/|$)/, (m, language) => (
+      LANGUAGES.includes(language) ? `/${language}` : m));
+    const relative = `${path || '/'}${url.search}${url.hash}`;
+    if (relative !== href) a.setAttribute('href', relative);
   });
 }
 
@@ -257,6 +229,7 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  localizeSourceLinks(main);
 }
 
 /**
