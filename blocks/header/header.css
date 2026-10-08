@@ -320,6 +320,11 @@ header .nav-col a:hover {
   color: var(--link-color);
 }
 
+header .nav .nav-col a.nav-col-more {
+  font-family: var(--heading-font-family);
+  color: var(--link-color);
+}
+
 /* CTAs */
 header .nav-cta-list {
   margin-top: 12px;
@@ -384,6 +389,7 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
    source colours. */
 @media (width >= 1024px) {
   header .header {
+    --nav-width: 936px;
     --bnp-green: rgb(0 150 94);
     --bnp-green-text: rgb(0 134 84);
     --bnp-green-hover: rgb(0 112 70);
@@ -398,7 +404,7 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
   /* fixed-width centred container, as on the source (936 / 1196 / 1416px) */
   header .nav {
     max-width: none;
-    width: 936px;
+    width: var(--nav-width);
     padding: 0;
   }
 
@@ -605,31 +611,84 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     color: var(--bnp-olive-text);
   }
 
-  /* full-width dropdown panel below the nav bar */
+  /* full-width dropdown panel directly below the header (source: 24px 16px
+     padding; columns span the header width + 12px each side, 19.2px down) */
   header .nav-panel {
+    box-sizing: border-box;
     position: absolute;
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
     max-width: 100vw;
+    padding: 24px 16px;
     background: #fff;
-    border-top: 1px solid var(--border-color);
-    box-shadow: 0 8px 16px rgb(0 0 0 / 8%);
+    box-shadow: 1px 8px 14px rgb(0 0 0 / 8%);
     z-index: 4;
   }
 
   header .nav-panel-inner {
     flex-direction: row;
-    gap: 48px;
-    max-width: var(--content-max-width);
-    margin: 0 auto;
-    padding: 32px;
+    gap: 0;
+    width: calc(var(--nav-width) + 24px);
+    max-width: 100%;
+    margin: 19.2px auto 0;
+    padding: 0;
   }
 
   header .nav-col {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
+    padding-right: 16px;
+  }
+
+  header .nav-col-heading {
+    margin: 0;
+    padding-bottom: 16px;
+    font-family: var(--heading-font-family);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 27px;
+    color: var(--text-color);
+  }
+
+  header .nav-col ul {
+    gap: 0;
+  }
+
+  header .nav-col li {
+    margin-bottom: 16px;
+  }
+
+  header .nav .nav-col a {
+    font-family: var(--body-font-family);
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--text-color);
+  }
+
+  header .nav .nav-col a:hover {
+    color: var(--bnp-green-text);
+  }
+
+  /* "see all" link: regular weight, green, followed by the source chevron */
+  header .nav .nav-col a.nav-col-more {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--heading-font-family);
+    color: var(--bnp-green-text);
+  }
+
+  header .nav .nav-col a.nav-col-more:hover {
+    color: rgb(0 109 68);
+  }
+
+  header .nav .nav-col a.nav-col-more::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background-color: currentcolor;
+    mask: url('../../icons/chevron-right.svg') center / 14px no-repeat;
   }
 
   /* CTAs: small 8px-radius buttons, 34px tall, 8px apart */
@@ -688,8 +747,8 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
 }
 
 @media (width >= 1280px) {
-  header .nav {
-    width: 1196px;
+  header .header {
+    --nav-width: 1196px;
   }
 
   header .nav-menu,
@@ -699,7 +758,7 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
 }
 
 @media (width >= 1600px) {
-  header .nav {
-    width: 1416px;
+  header .header {
+    --nav-width: 1416px;
   }
 }
