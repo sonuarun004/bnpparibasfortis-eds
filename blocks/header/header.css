@@ -336,6 +336,15 @@ header .nav-cta {
   white-space: nowrap;
 }
 
+header .nav-main-open .nav-cta-list {
+  padding: 0 16px;
+}
+
+header .nav-cta .nav-icon {
+  margin-right: 8px;
+  vertical-align: -0.15em;
+}
+
 /* "header .nav a" would otherwise win and turn the CTA text grey */
 header .nav a.nav-cta-outline {
   border: 1px solid var(--link-color);
@@ -355,10 +364,53 @@ header .nav a.nav-cta-outline:hover {
   background: rgb(0 150 94 / 8%);
 }
 
-/* ---- tablet / desktop ---- */
-@media (width >= 900px) {
+/* ---- icons (SVGs from /icons, painted with the text colour) ---- */
+header .nav-icon {
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  background-color: currentcolor;
+  mask: var(--icon) center / contain no-repeat;
+}
+
+header .nav-icon-lock { --icon: url('../../icons/lock.svg'); }
+header .nav-icon-ask-outline { --icon: url('../../icons/ask-outline.svg'); }
+header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
+
+/* ---- desktop: matches bnpparibasfortis.be ----
+   Exact source values; only text colours are nudged to the nearest shade that
+   meets WCAG AA (4.5:1). Icons, chevrons, borders and underlines keep the
+   source colours. */
+@media (width >= 1024px) {
+  header .header {
+    --bnp-green: rgb(0 150 94);
+    --bnp-green-text: rgb(0 134 84);
+    --bnp-green-hover: rgb(0 112 70);
+    --bnp-blue: rgb(51 148 204);
+    --bnp-blue-text: rgb(42 123 169);
+    --bnp-olive-text: rgb(119 119 69);
+
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 1px 2px 14px rgb(0 0 0 / 8%);
+  }
+
+  /* fixed-width centred container, as on the source (936 / 1196 / 1416px) */
   header .nav {
-    padding: 0 32px;
+    max-width: none;
+    width: 936px;
+    padding: 0;
+  }
+
+  /* row 1: logo, audiences | contact, language, search (68px) */
+  header .nav-utility {
+    min-height: 68px;
+    gap: 0;
+  }
+
+  header .nav-utility-left,
+  header .nav-utility-right {
+    gap: 0;
   }
 
   header .nav-audience,
@@ -368,31 +420,117 @@ header .nav a.nav-cta-outline:hover {
     display: flex;
   }
 
-  header .nav-brand img {
-    width: 164px;
-  }
-
   header .nav-hamburger {
     display: none;
   }
 
-  /* main nav becomes a horizontal bar; it is the positioning context for the
-     dropdown panels so they center on the nav (≈ viewport), not on the button */
+  header .nav-brand a {
+    display: block;
+    line-height: 0;
+  }
+
+  header .nav-brand img {
+    width: 155px;
+    height: 32px;
+  }
+
+  header .nav-audience {
+    gap: 0;
+  }
+
+  header .nav .nav-audience a {
+    margin: 0 12px;
+    font-family: var(--body-font-family);
+    font-size: 14px;
+    line-height: 21px;
+    color: rgb(0 0 0);
+  }
+
+  header .nav .nav-audience a.active {
+    display: inline-block;
+    line-height: 14px;
+    border-bottom: 2px solid var(--bnp-green);
+    font-family: var(--heading-font-family);
+  }
+
+  header .nav .nav-audience a:hover {
+    color: rgb(0 0 0);
+  }
+
+  header .nav .nav-utility-tools a {
+    display: flex;
+    align-items: center;
+    gap: 4.8px;
+    font-family: var(--heading-font-family);
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--bnp-blue-text);
+  }
+
+  header .nav .nav-utility-tools .nav-icon {
+    font-size: 21px;
+    color: var(--bnp-blue);
+  }
+
+  header .nav-lang {
+    margin-left: 24px;
+  }
+
+  header .nav-lang-toggle {
+    gap: 5.6px;
+    padding: 1px 6px;
+    font-family: var(--heading-font-family);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
+    color: rgb(0 0 0);
+  }
+
+  /* source chevron: an 18px icon-font glyph (≈9×5px) in the brand green */
+  header .nav-lang-toggle::after {
+    width: 18.2px;
+    height: 11px;
+    border: 0;
+    background-color: var(--bnp-green);
+    mask: url('../../icons/chevron-down.svg') center / 18.2px no-repeat;
+    transform: none;
+  }
+
+  header .nav-lang-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+  }
+
+  /* the source icon sits 3px above the row's centre line */
+  header .nav a.nav-search {
+    position: relative;
+    top: -3px;
+    width: 24px;
+    height: 24px;
+    margin-left: 8px;
+    font-size: 24px;
+    color: var(--bnp-green);
+  }
+
+  header .nav a.nav-search:hover {
+    color: var(--bnp-green-hover);
+  }
+
+  /* row 2: main menu | CTAs (69px, no rule between the rows) */
   header .nav-main {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    min-height: 69px;
     padding: 0;
-    border-top: 1px solid var(--border-color);
-    min-height: 60px;
+    border-top: 0;
     position: relative;
   }
 
   header .nav-menu-list {
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 24px;
   }
 
   header .nav-menu-item {
@@ -401,31 +539,70 @@ header .nav a.nav-cta-outline:hover {
 
   header .nav-menu,
   header .nav-link {
+    position: relative;
     width: auto;
-    padding: 18px 12px;
-    font-size: 15px;
+    padding: 22.4px 16px 22.4px 0;
+    font-family: var(--body-font-family);
+    font-size: 14px;
     font-weight: 400;
+    line-height: 24px;
+    color: var(--text-color);
     white-space: nowrap;
   }
 
+  header .nav-menu:hover,
+  header .nav-link:hover {
+    color: var(--text-color);
+  }
+
+  /* source chevron: a 16px icon-font glyph (≈8×5px) in the brand green,
+     sitting in the button's 16px right padding */
   header .nav-menu[aria-haspopup="true"]::after {
     content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-left: 8px;
-    border-right: 2px solid currentcolor;
-    border-bottom: 2px solid currentcolor;
-    transform: translateY(-2px) rotate(45deg);
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0;
+    border: 0;
+    background-color: var(--bnp-green);
+    mask: url('../../icons/chevron-down.svg') center / 18px no-repeat;
+    transform: none;
     transition: transform 0.2s ease;
   }
 
   header .nav-menu[aria-expanded="true"] {
-    color: var(--link-color);
+    color: var(--text-color);
   }
 
   header .nav-menu[aria-expanded="true"]::after {
-    transform: translateY(1px) rotate(-135deg);
+    transform: rotate(180deg);
+  }
+
+  /* Private Banking: separated by a grey rule, set in the slab serif */
+  header .nav-menu-item-featured {
+    position: relative;
+    padding-left: 24px;
+  }
+
+  header .nav-menu-item-featured::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 30px;
+    margin-top: -15px;
+    border-left: 1px solid var(--border-color-strong);
+  }
+
+  header .nav-menu-item-featured .nav-link,
+  header .nav-menu-item-featured .nav-link:hover {
+    padding-right: 0;
+    font-family: var(--slab-font-family);
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--bnp-olive-text);
   }
 
   /* full-width dropdown panel below the nav bar */
@@ -455,10 +632,74 @@ header .nav a.nav-cta-outline:hover {
     min-width: 0;
   }
 
+  /* CTAs: small 8px-radius buttons, 34px tall, 8px apart */
   header .nav-cta-list {
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 0;
     margin-top: 0;
+  }
+
+  header .nav-cta {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 8px;
+    padding: 4px 8px;
+    border: 1px solid var(--bnp-green);
+    border-radius: 8px;
+    font-family: var(--heading-font-family);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+  header .nav a.nav-cta-outline {
+    border-color: var(--bnp-green);
+    background: #fff;
+    color: var(--bnp-green-text);
+  }
+
+  header .nav a.nav-cta-outline:hover {
+    background: rgb(210 238 227);
+    color: rgb(0 74 46);
+  }
+
+  header .nav a.nav-cta-primary {
+    border-color: var(--bnp-green-text);
+    background: var(--bnp-green-text);
+  }
+
+  header .nav a.nav-cta-primary:hover {
+    border-color: rgb(0 99 62);
+    background: var(--bnp-green-hover);
+  }
+
+  header .nav-cta .nav-icon {
+    margin-right: 8px;
+    font-size: 20px;
+  }
+}
+
+/* on the source, the CTAs overhang the 936px container by 24px at this size */
+@media (width >= 1024px) and (width < 1280px) {
+  header .nav-main {
+    margin-right: -24px;
+  }
+}
+
+@media (width >= 1280px) {
+  header .nav {
+    width: 1196px;
+  }
+
+  header .nav-menu,
+  header .nav-link {
+    font-size: 16px;
+  }
+}
+
+@media (width >= 1600px) {
+  header .nav {
+    width: 1416px;
   }
 }

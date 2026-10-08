@@ -3,6 +3,7 @@
      Headings/UI use the regular weight; body copy uses the light weight. */
   --heading-font-family: bnppsans, helvetica, arial, sans-serif;
   --body-font-family: bnppsans-light, helvetica, arial, sans-serif;
+  --slab-font-family: bnppslabserif, georgia, serif;
 
   /* Colors */
   --background-color: rgb(241 242 246);

@@ -6,7 +6,39 @@ import {
   LANGUAGES, getLocale, localeUrl, fetchLocaleFragment,
 } from '../../scripts/scripts.js';
 
-const DESKTOP = window.matchMedia('(min-width: 900px)');
+// matches the source site, which switches to its compact mobile header below 1024px
+const DESKTOP = window.matchMedia('(min-width: 1024px)');
+
+/**
+ * Create a decorative icon (an SVG from /icons, painted with currentColor
+ * through a CSS mask so it follows the text colour).
+ * @param {string} name Icon name, e.g. 'lock'
+ * @returns {Element}
+ */
+function buildIcon(name) {
+  const icon = document.createElement('span');
+  icon.className = `nav-icon nav-icon-${name}`;
+  icon.setAttribute('aria-hidden', 'true');
+  return icon;
+}
+
+/**
+ * Mark the audience link for the current section as active. Pages outside
+ * every audience (e.g. "over ons" content) fall back to the first audience,
+ * as on the source site.
+ * @param {Element} list The audience <ul>
+ */
+function markActiveAudience(list) {
+  const links = [...list.querySelectorAll('a')];
+  if (!links.length) return;
+  const path = window.location.pathname;
+  const active = links.find((a) => {
+    const href = new URL(a.href, window.location.href).pathname.replace(/\/$/, '');
+    return href && path.startsWith(href);
+  }) || links[0];
+  active.classList.add('active');
+  active.setAttribute('aria-current', 'page');
+}
 
 const SKIP_LINK_LABELS = {
   nl: 'Ga direct naar hoofdinhoud',
@@ -153,6 +185,7 @@ function buildMainNav(section) {
         a.href = href;
         a.textContent = label;
         a.className = 'nav-link';
+        li.classList.add('nav-menu-item-featured');
         li.append(a);
       } else {
         const btn = document.createElement('button');
@@ -201,14 +234,16 @@ function buildMainNav(section) {
           const btn = document.createElement('a');
           btn.href = a.getAttribute('href');
           btn.textContent = a.textContent.trim();
-          btn.className = i === links.length - 1 ? 'nav-cta nav-cta-primary' : 'nav-cta nav-cta-outline';
+          const primary = i === links.length - 1;
+          btn.className = primary ? 'nav-cta nav-cta-primary' : 'nav-cta nav-cta-outline';
+          if (primary) btn.prepend(buildIcon('lock'));
           li.append(btn);
           toolsList.append(li);
         });
       } else {
         links.forEach((a) => {
           const li = document.createElement('li');
-          li.className = 'nav-menu-item';
+          li.className = 'nav-menu-item nav-menu-item-featured';
           const link = document.createElement('a');
           link.href = a.getAttribute('href');
           link.textContent = a.textContent.trim();
@@ -252,14 +287,15 @@ function buildUtilityBar(section) {
   logo.src = '/icons/bnppf-logo.svg';
   logo.alt = 'BNP Paribas Fortis';
   logo.className = 'nav-logo';
-  logo.width = 164;
-  logo.height = 34;
+  logo.width = 155;
+  logo.height = 32;
   link.append(logo);
   brand.append(link);
 
   const audience = document.createElement('ul');
   audience.className = 'nav-audience';
   if (lists[0]) audience.innerHTML = lists[0].innerHTML;
+  markActiveAudience(audience);
 
   // Utility tools list (e.g. Zoeken, Contacteer ons). The search entry is
   // pulled out and re-rendered as an icon button on the far right.
@@ -271,7 +307,9 @@ function buildUtilityBar(section) {
   toolLinks.forEach((a) => {
     if (a === searchLink) return;
     const li = document.createElement('li');
-    li.append(a.cloneNode(true));
+    const item = a.cloneNode(true);
+    if (/contact/.test(item.getAttribute('href') || '')) item.prepend(buildIcon('ask-outline'));
+    li.append(item);
     tools.append(li);
   });
 
@@ -325,7 +363,7 @@ function buildUtilityBar(section) {
     search.className = 'nav-search';
     search.href = searchLink.getAttribute('href');
     search.setAttribute('aria-label', searchLink.textContent.trim() || 'Zoeken');
-    search.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    search.append(buildIcon('search'));
   }
 
   const left = document.createElement('div');
