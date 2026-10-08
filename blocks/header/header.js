@@ -532,6 +532,14 @@ export default async function decorate(block) {
     }
   });
 
+  // desktop: past 60px of scrolling only the main menu row stays pinned
+  const headerEl = block.closest('header');
+  if (headerEl) {
+    const onScroll = () => headerEl.classList.toggle('header-scrolled', window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
   DESKTOP.addEventListener('change', () => {
     closeAllMenus(nav);
     setDrawer(false);
