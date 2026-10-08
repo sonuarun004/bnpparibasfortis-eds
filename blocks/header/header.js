@@ -206,7 +206,16 @@ function buildMainNav(section) {
           const h = document.createElement('p');
           h.className = 'nav-col-heading';
           h.textContent = heading;
-          col.append(h, list.cloneNode(true));
+          const links = list.cloneNode(true);
+          // A bold link is the column's "see all" link (green, with a chevron)
+          links.querySelectorAll('li').forEach((item) => {
+            const strong = item.querySelector('strong');
+            const a = item.querySelector('a');
+            if (!strong || !a) return;
+            strong.replaceWith(...strong.childNodes);
+            a.classList.add('nav-col-more');
+          });
+          col.append(h, links);
           inner.append(col);
         });
         panel.append(inner);
