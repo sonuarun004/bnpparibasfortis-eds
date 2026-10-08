@@ -300,19 +300,40 @@ main > .section {
   background-color: var(--surface-color);
 }
 
+/* content column, as on the source: 8px side margins on mobile, then fixed
+   widths of 704 / 960 / 1220 / 1440px (= the header width + 24px) */
 main > .section > div {
-  max-width: 1200px;
+  box-sizing: border-box;
+  max-width: calc(100% - 16px);
   margin: auto;
-  padding: 0 24px;
+  padding: 0;
 }
 
 main > .section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >= 900px) {
+@media (width >= 768px) {
   main > .section > div {
-    padding: 0 32px;
+    max-width: 704px;
+  }
+}
+
+@media (width >= 1024px) {
+  main > .section > div {
+    max-width: 960px;
+  }
+}
+
+@media (width >= 1280px) {
+  main > .section > div {
+    max-width: 1220px;
+  }
+}
+
+@media (width >= 1600px) {
+  main > .section > div {
+    max-width: 1440px;
   }
 }
 
@@ -326,13 +347,50 @@ main .section.highlight {
 
 /* default content — centered headings/intro, matching the source */
 main .default-content-wrapper {
-  max-width: 860px;
-  margin-inline: auto;
   text-align: center;
 }
 
+/* page intro (h1 + lead paragraph), source values per breakpoint */
 main .default-content-wrapper h1 {
-  margin-bottom: 0.5em;
+  margin: 12px 0 8px;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+main .default-content-wrapper h1 + p {
+  margin: 0 auto 24px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@media (width >= 768px) {
+  main .default-content-wrapper h1 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+}
+
+@media (width >= 1024px) {
+  main .default-content-wrapper h1 {
+    font-size: 40px;
+    line-height: 40px;
+  }
+
+  main .default-content-wrapper h1 + p {
+    max-width: 75%;
+  }
+}
+
+@media (width >= 1280px) {
+  main .default-content-wrapper h1 {
+    line-height: 48px;
+  }
+
+  main .default-content-wrapper h1 + p {
+    margin-bottom: 40px;
+    font-size: 20px;
+    line-height: 28px;
+  }
 }
 
 /* <main> receives focus from the skip link; no outline on the whole region */
