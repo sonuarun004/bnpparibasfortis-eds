@@ -350,6 +350,39 @@ main .default-content-wrapper {
   text-align: center;
 }
 
+/* section titles (h2 in default content), source values per breakpoint */
+main .default-content-wrapper h2 {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 32px;
+}
+
+/* a new source section starts 52px (48px padding + 4px) below the previous
+   block's bottom margin; padding so it doesn't collapse with that margin */
+main .columns-wrapper + .default-content-wrapper {
+  padding-top: 52px;
+}
+
+main .cards-partner-wrapper + .default-content-wrapper {
+  padding-top: 4px;
+}
+
+@media (width >= 768px) {
+  main .default-content-wrapper h2 {
+    font-size: 24px;
+    line-height: 40px;
+  }
+}
+
+@media (width >= 1280px) {
+  main .default-content-wrapper h2 {
+    margin-bottom: 40px;
+    font-size: 32px;
+    line-height: 48px;
+  }
+}
+
 /* page intro (h1 + lead paragraph), source values per breakpoint */
 main .default-content-wrapper h1 {
   margin: 12px 0 8px;
