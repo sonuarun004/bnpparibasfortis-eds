@@ -11,7 +11,7 @@ header {
   height: auto;
 }
 
-/* the mobile header stays at the top of the screen, as on the source */
+/* the header stays at the top of the screen, as on the source */
 header {
   position: sticky;
   top: 0;
@@ -618,9 +618,10 @@ header .nav-icon-close { --icon: url('../../icons/close.svg'); }
    meets WCAG AA (4.5:1). Icons, chevrons, borders and underlines keep the
    source colours. */
 @media (width >= 1024px) {
-  /* the header scrolls with the page on desktop */
-  header {
-    position: static;
+  /* once the page is scrolled, the top row slides out of view and only the
+     main menu stays pinned (the source leaves 4px of the top row showing) */
+  header.header-scrolled {
+    top: -64px;
   }
 
   header .header {
