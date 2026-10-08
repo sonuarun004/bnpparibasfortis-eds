@@ -14,5 +14,12 @@ export default function decorate(block) {
         }
       }
     });
+    // image + text rows get the source's media layout; remember which side
+    // the image is on (it decides the direction of the grey offset panel)
+    const imgCol = row.querySelector(':scope > .columns-img-col');
+    if (imgCol && row.children.length === 2) {
+      block.classList.add('columns-media');
+      row.classList.add(imgCol === row.firstElementChild ? 'columns-img-left' : 'columns-img-right');
+    }
   });
 }
