@@ -7,7 +7,7 @@
 // Brand imagery (Card Stop icon, logo) is served from the code repo /icons/
 // so it survives publishing and needs no authoring.
 
-import { fetchLocaleFragment, resolveSourceLinks } from '../../scripts/scripts.js';
+import { fetchLocaleFragment, localizeSourceLinks } from '../../scripts/scripts.js';
 
 const CARDSTOP_ICON = '/icons/stopcard.png';
 const COPYRIGHT_LOGO = '/icons/bnppf-logo.svg';
@@ -367,7 +367,7 @@ export default async function decorate(block) {
     const parts = partsFromBlock(block);
     block.textContent = '';
     block.append(...buildFooterInner(parts));
-    resolveSourceLinks(block);
+    localizeSourceLinks(block);
     return;
   }
 
@@ -382,5 +382,5 @@ export default async function decorate(block) {
     ? partsFromBlock(embedded)
     : partsFromFragment(fragmentSections(doc));
   block.append(...buildFooterInner(parts));
-  resolveSourceLinks(block);
+  localizeSourceLinks(block);
 }
