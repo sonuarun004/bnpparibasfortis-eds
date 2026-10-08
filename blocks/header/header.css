@@ -1,5 +1,7 @@
 /* BNP Paribas Fortis header — utility bar + main nav with click megamenus.
-   Mobile-first: base styles are mobile; min-width media queries enhance. */
+   Mobile-first: base styles are mobile; min-width media queries enhance.
+   Below 1024px it is the source's compact header: logo mark, audience
+   dropdown, search and a menu button opening a full-screen menu. */
 
 /* stylelint-disable no-descending-specificity */
 
@@ -7,6 +9,13 @@
 header.header-wrapper,
 header {
   height: auto;
+}
+
+/* the mobile header stays at the top of the screen, as on the source */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 /* skip link: hidden off-screen until it receives keyboard focus */
@@ -27,14 +36,25 @@ header .skip-link:focus {
   top: 8px;
 }
 
-/* white bar across the full width (the page itself is grey); the logo SVG has
-   a white background, so it only blends in on white */
+/* white bar across the full width (the page itself is grey).
+   Exact source values; only text colours are nudged to the nearest shade that
+   meets WCAG AA (4.5:1). Icons, chevrons, borders and underlines keep the
+   source colours. */
 header .header {
+  --bnp-green: rgb(0 150 94);
+  --bnp-green-text: rgb(0 134 84);
+  --bnp-green-hover: rgb(0 112 70);
+  --bnp-blue: rgb(51 148 204);
+  --bnp-blue-text: rgb(42 123 169);
+  --bnp-olive-text: rgb(119 119 69);
+
   background-color: #fff;
   width: 100%;
   z-index: 3;
   position: relative;
+  margin-bottom: -1px; /* the bottom rule overlaps the page, as on the source */
   border-bottom: 1px solid var(--border-color);
+  box-shadow: 1px 2px 14px rgb(0 0 0 / 8%);
 }
 
 header .nav p {
@@ -45,7 +65,7 @@ header .nav {
   box-sizing: border-box;
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0;
   font-family: var(--body-font-family);
 }
 
@@ -60,20 +80,24 @@ header .nav ul {
   padding: 0;
 }
 
-/* ---- utility bar ---- */
+/* ---- utility bar: logo mark | audience dropdown (centred) | search, menu ---- */
 header .nav-utility {
+  box-sizing: border-box;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 56px;
+  min-height: 66px;
+  padding: 0 24px;
+  border-bottom: 1px solid rgb(238 238 238);
 }
 
 header .nav-utility-left,
 header .nav-utility-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 header .nav-brand p {
@@ -81,29 +105,100 @@ header .nav-brand p {
   line-height: 0;
 }
 
-header .nav-brand img {
-  width: 132px;
-  height: auto;
+/* the source sets the logo 1px and the icons 2px above the bar's centre */
+header .nav-brand a {
+  position: relative;
+  top: -1px;
+  display: block;
+  line-height: 0;
 }
 
-header .nav-audience li,
+header .nav-utility-right {
+  position: relative;
+  top: -2px;
+}
+
+header .nav-brand img {
+  width: 24px;
+  height: 24px;
+}
+
 header .nav-utility-tools li,
 header .nav-lang li {
   display: inline-flex;
   align-items: center;
 }
 
-header .nav-audience {
+/* audience dropdown */
+header .nav-audience-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+header .nav-audience-toggle {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 1px 6px;
+  border: 0;
+  background: none;
+  font-family: var(--heading-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: rgb(0 0 0);
+  cursor: pointer;
+}
+
+/* the source's 21px chevron glyph; flips when open */
+header .nav-audience-toggle::after {
+  content: '';
+  width: 20.8px;
+  height: 20.8px;
+  background-color: currentcolor;
+  mask: url('../../icons/chevron-down.svg') center / 20.8px no-repeat;
+}
+
+header .nav-audience-toggle[aria-expanded="true"]::after {
+  transform: scaleY(-1);
+}
+
+/* "header .nav ul" would otherwise reset the padding */
+header .nav .nav-audience {
   display: none;
-  gap: 20px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 5;
+  padding: 4px 0;
+  background-color: rgb(246 246 246);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 8%);
 }
 
-header .nav-audience a {
+header .nav-audience-toggle[aria-expanded="true"] + .nav-audience {
+  display: block;
+}
+
+header .nav .nav-audience a {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 4px 24px;
+  font-family: var(--heading-font-family);
   font-size: 14px;
+  line-height: 21px;
+  white-space: nowrap;
+  color: var(--text-color);
 }
 
-header .nav-audience a:hover {
-  color: var(--link-color);
+/* the source green, darkened just enough for 4.5:1 on the grey dropdown */
+header .nav .nav-audience a.active,
+header .nav .nav-audience a:hover {
+  color: rgb(0 130 81);
 }
 
 header .nav-utility-tools {
@@ -116,7 +211,7 @@ header .nav-utility-tools a {
   color: var(--link-color);
 }
 
-/* language dropdown */
+/* language dropdown (desktop; the mobile menu lists the languages) */
 header .nav-lang {
   display: none;
   position: relative;
@@ -181,102 +276,81 @@ header .nav-lang-menu a:hover {
   background: rgb(0 150 94 / 8%);
 }
 
-/* search icon */
-header .nav-search {
-  display: none;
+/* search icon: 24px, black */
+header .nav a.nav-search {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  color: var(--link-color);
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  color: rgb(0 0 0);
 }
 
-header .nav-search:hover {
-  color: var(--link-hover-color);
-}
-
-/* ---- hamburger (mobile only) ---- */
+/* ---- menu button (mobile only): the source's menu / close glyphs ---- */
 header .nav-hamburger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   background: none;
+  font-size: 24px;
+  color: var(--text-color);
   cursor: pointer;
 }
 
-header .nav-hamburger-icon,
-header .nav-hamburger-icon::before,
-header .nav-hamburger-icon::after {
-  content: '';
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--text-color);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+header .nav-hamburger .nav-icon-close,
+header .nav-hamburger[aria-expanded="true"] .nav-icon-menu {
+  display: none;
 }
 
-header .nav-hamburger-icon::before {
-  transform: translateY(-7px);
+header .nav-hamburger[aria-expanded="true"] .nav-icon-close {
+  display: inline-block;
 }
 
-header .nav-hamburger-icon::after {
-  transform: translateY(5px);
-}
-
-header .nav-hamburger[aria-expanded="true"] .nav-hamburger-icon {
-  background: transparent;
-}
-
-header .nav-hamburger[aria-expanded="true"] .nav-hamburger-icon::before {
-  transform: translateY(0) rotate(45deg);
-}
-
-header .nav-hamburger[aria-expanded="true"] .nav-hamburger-icon::after {
-  transform: translateY(-2px) rotate(-45deg);
-}
-
-/* ---- main nav (collapsed on mobile) ---- */
+/* ---- main nav: a full-screen menu below the bar on mobile ---- */
 header .nav-main {
   display: none;
-  flex-direction: column;
-  padding: 8px 0 16px;
-  border-top: 1px solid var(--border-color);
 }
 
 header .nav-main.nav-main-open {
-  display: flex;
-
-  /* full-width flush drawer: cancel the .nav container's 16px side padding so
-     items span the viewport edge-to-edge (text inset comes from link padding) */
-  margin: 0 -16px;
-  padding: 8px 0 16px;
-}
-
-header .nav-menu-list,
-header .nav-cta-list {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 66px 0 0;
+  z-index: 4;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  overflow-y: auto;
+  background-color: #fff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+header .nav .nav-menu-list {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  padding: 0 16px;
 }
 
 header .nav-menu-item {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgb(224 224 224);
 }
 
 header .nav-menu,
 header .nav-link {
+  position: relative;
   display: block;
   width: 100%;
-  padding: 14px 16px;
+  padding: 16px 0;
   border: 0;
   background: none;
-  font: inherit;
+  font-family: var(--body-font-family);
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 400;
+  line-height: 24px;
   text-align: left;
   color: var(--text-color);
   cursor: pointer;
@@ -284,89 +358,227 @@ header .nav-link {
 
 header .nav-link:hover,
 header .nav-menu:hover {
-  color: var(--link-color);
+  color: var(--bnp-green-text);
 }
 
-/* megamenu panel (stacked accordion on mobile) */
+/* the source's 24px green chevron at the right of each menu row */
+header .nav-menu[aria-haspopup="true"]::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  background-color: var(--bnp-green);
+  mask: url('../../icons/chevron-right.svg') center / 24px no-repeat;
+}
+
+/* Private Banking: the slab serif in olive */
+header .nav-menu-item-featured .nav-link,
+header .nav-menu-item-featured .nav-link:hover {
+  font-family: var(--slab-font-family);
+  color: var(--bnp-olive-text);
+}
+
+/* contact link: blue, with the source's speech-bubble icon */
+header .nav-menu-item-contact {
+  border-bottom: 0;
+}
+
+header .nav .nav-menu-item-contact a {
+  display: flex;
+  align-items: center;
+  gap: 4.8px;
+  padding: 16px 0;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--bnp-blue-text);
+}
+
+header .nav-menu-item-contact .nav-icon {
+  font-size: 24px;
+  color: var(--bnp-blue);
+}
+
+/* sub-menu: covers the menu, with a back button and the menu title */
+header .nav-panel {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 66px 0 0;
+  z-index: 5;
+  overflow-y: auto;
+  padding: 24px;
+  background-color: #fff;
+}
+
 header .nav-panel[hidden] {
   display: none;
+}
+
+header .nav-panel-back {
+  display: flex;
+  align-items: center;
+  margin: 0 0 16px;
+  padding: 1px 0;
+  border: 0;
+  background: none;
+  font-family: var(--heading-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--bnp-green-text);
+  cursor: pointer;
+}
+
+header .nav-panel-back::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background-color: var(--bnp-green);
+  mask: url('../../icons/chevron-left.svg') center / 16px no-repeat;
+}
+
+header .nav .nav-panel-title {
+  margin: 0 0 19px;
+  font-family: var(--heading-font-family);
+  font-size: 24px;
+  line-height: 36px;
+  color: var(--text-color);
 }
 
 header .nav-panel-inner {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 8px 0 12px 12px;
 }
 
 header .nav-col-heading {
-  margin: 8px 0 4px;
-  font-weight: 500;
+  margin: 0;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--heading-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
   color: var(--text-color);
 }
 
 header .nav-col ul {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-header .nav-col a {
-  font-size: 14px;
+header .nav .nav-col a {
+  display: block;
+  padding: 16px 0;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  line-height: 24px;
   color: var(--text-color);
 }
 
-header .nav-col a:hover {
-  color: var(--link-color);
+header .nav .nav-col a:hover {
+  color: var(--bnp-green-text);
 }
 
+/* "see all" link: regular weight, green, followed by the source chevron */
 header .nav .nav-col a.nav-col-more {
+  display: flex;
+  align-items: center;
   font-family: var(--heading-font-family);
-  color: var(--link-color);
+  color: var(--bnp-green-text);
 }
 
-/* CTAs */
-header .nav-cta-list {
-  margin-top: 12px;
-  gap: 8px;
+header .nav .nav-col a.nav-col-more:hover {
+  color: rgb(0 109 68);
+}
+
+header .nav .nav-col a.nav-col-more::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background-color: currentcolor;
+  mask: url('../../icons/chevron-right.svg') center / 14px no-repeat;
+}
+
+/* CTAs: full-width buttons, the sign-in button first */
+header .nav .nav-cta-list {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 12px 16px;
+  border-top: 1px solid rgb(223 225 234);
 }
 
 header .nav-cta {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 24px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0;
+  padding: 8px 0;
+  border: 1px solid var(--bnp-green);
+  border-radius: 8px;
+  font-family: var(--heading-font-family);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
+  line-height: 21px;
   text-align: center;
   white-space: nowrap;
 }
 
-header .nav-main-open .nav-cta-list {
-  padding: 0 16px;
+/* as on the source, the lock icon sits on the text baseline */
+header .nav-cta-primary {
+  display: block;
 }
 
 header .nav-cta .nav-icon {
   margin-right: 8px;
-  vertical-align: -0.15em;
+  font-size: 20px;
 }
 
 /* "header .nav a" would otherwise win and turn the CTA text grey */
 header .nav a.nav-cta-outline {
-  border: 1px solid var(--link-color);
-  color: var(--link-color);
+  height: 39px;
+  background: #fff;
+  color: var(--bnp-green-text);
 }
 
 header .nav a.nav-cta-primary {
-  background: var(--link-color);
+  height: 44px;
+  border-color: var(--bnp-green-text);
+  background: var(--bnp-green-text);
   color: #fff;
 }
 
 header .nav a.nav-cta-primary:hover {
-  background: var(--link-hover-color);
+  border-color: rgb(0 99 62);
+  background: var(--bnp-green-hover);
 }
 
 header .nav a.nav-cta-outline:hover {
-  background: rgb(0 150 94 / 8%);
+  background: rgb(210 238 227);
+  color: rgb(0 74 46);
+}
+
+/* languages, centred at the bottom of the menu; the current one underlined */
+header .nav .nav-drawer-lang {
+  display: flex;
+  justify-content: center;
+  padding: 0 24px 24px;
+}
+
+header .nav .nav-drawer-lang a {
+  margin: 0 12px;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: rgb(0 0 0);
+}
+
+header .nav .nav-drawer-lang a[aria-current] {
+  border-bottom: 2px solid var(--bnp-green);
+  font-family: var(--heading-font-family);
 }
 
 /* ---- icons (SVGs from /icons, painted with the text colour) ---- */
@@ -382,41 +594,64 @@ header .nav-icon {
 header .nav-icon-lock { --icon: url('../../icons/lock.svg'); }
 header .nav-icon-ask-outline { --icon: url('../../icons/ask-outline.svg'); }
 header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
+header .nav-icon-menu { --icon: url('../../icons/menu.svg'); }
+header .nav-icon-close { --icon: url('../../icons/close.svg'); }
+
+/* ---- tablet: the open menu keeps to the 704px page width ---- */
+@media (width >= 768px) and (width < 1024px) {
+  header .nav-main.nav-main-open {
+    padding: 0 calc((100% - 704px) / 2);
+  }
+
+  header .nav-panel {
+    padding: 24px calc((100% - 704px) / 2);
+  }
+
+  header .nav .nav-col a {
+    font-size: 14px;
+    line-height: 21px;
+  }
+}
 
 /* ---- desktop: matches bnpparibasfortis.be ----
    Exact source values; only text colours are nudged to the nearest shade that
    meets WCAG AA (4.5:1). Icons, chevrons, borders and underlines keep the
    source colours. */
 @media (width >= 1024px) {
+  /* the header scrolls with the page on desktop */
+  header {
+    position: static;
+  }
+
   header .header {
     --nav-width: 936px;
-    --bnp-green: rgb(0 150 94);
-    --bnp-green-text: rgb(0 134 84);
-    --bnp-green-hover: rgb(0 112 70);
-    --bnp-blue: rgb(51 148 204);
-    --bnp-blue-text: rgb(42 123 169);
-    --bnp-olive-text: rgb(119 119 69);
 
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 1px 2px 14px rgb(0 0 0 / 8%);
+    margin-bottom: 0;
   }
 
   /* fixed-width centred container, as on the source (936 / 1196 / 1416px) */
   header .nav {
     max-width: none;
     width: var(--nav-width);
-    padding: 0;
   }
 
   /* row 1: logo, audiences | contact, language, search (68px) */
   header .nav-utility {
+    position: static;
     min-height: 68px;
     gap: 0;
+    padding: 0;
+    border-bottom: 0;
   }
 
   header .nav-utility-left,
   header .nav-utility-right {
     gap: 0;
+  }
+
+  header .nav-brand a,
+  header .nav-utility-right {
+    position: static;
   }
 
   header .nav-audience,
@@ -426,13 +661,12 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     display: flex;
   }
 
-  header .nav-hamburger {
+  header .nav-hamburger,
+  header .nav-audience-toggle,
+  header .nav-panel-head,
+  header .nav-menu-item-contact,
+  header .nav .nav-drawer-lang {
     display: none;
-  }
-
-  header .nav-brand a {
-    display: block;
-    line-height: 0;
   }
 
   header .nav-brand img {
@@ -440,12 +674,32 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     height: 32px;
   }
 
-  header .nav-audience {
+  /* the audiences are inline links, not a dropdown */
+  header .nav-audience-wrap {
+    display: contents;
+  }
+
+  header .nav .nav-audience,
+  header .nav .nav-audience-toggle[aria-expanded="true"] + .nav-audience {
+    display: flex;
+    position: static;
     gap: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  header .nav-audience li {
+    display: inline-flex;
+    align-items: center;
   }
 
   header .nav .nav-audience a {
+    box-sizing: content-box;
+    display: inline;
+    min-height: auto;
     margin: 0 12px;
+    padding: 0;
     font-family: var(--body-font-family);
     font-size: 14px;
     line-height: 21px;
@@ -457,6 +711,7 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     line-height: 14px;
     border-bottom: 2px solid var(--bnp-green);
     font-family: var(--heading-font-family);
+    color: rgb(0 0 0);
   }
 
   header .nav .nav-audience a:hover {
@@ -533,10 +788,12 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     position: relative;
   }
 
-  header .nav-menu-list {
+  header .nav .nav-menu-list {
+    flex: 0 1 auto;
     flex-direction: row;
     align-items: center;
     gap: 24px;
+    padding: 0;
   }
 
   header .nav-menu-item {
@@ -616,8 +873,7 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
   header .nav-panel {
     box-sizing: border-box;
     position: absolute;
-    top: 100%;
-    left: 50%;
+    inset: 100% auto auto 50%;
     transform: translateX(-50%);
     width: 100vw;
     max-width: 100vw;
@@ -625,6 +881,7 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     background: #fff;
     box-shadow: 1px 8px 14px rgb(0 0 0 / 8%);
     z-index: 4;
+    overflow-y: visible;
   }
 
   header .nav-panel-inner {
@@ -644,7 +901,8 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
 
   header .nav-col-heading {
     margin: 0;
-    padding-bottom: 16px;
+    padding: 0 0 16px;
+    border-bottom: 0;
     font-family: var(--heading-font-family);
     font-size: 18px;
     font-weight: 400;
@@ -661,6 +919,8 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
   }
 
   header .nav .nav-col a {
+    display: inline;
+    padding: 0;
     font-family: var(--body-font-family);
     font-size: 14px;
     line-height: 21px;
@@ -683,26 +943,22 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     color: rgb(0 109 68);
   }
 
-  header .nav .nav-col a.nav-col-more::after {
-    content: '';
-    width: 14px;
-    height: 14px;
-    background-color: currentcolor;
-    mask: url('../../icons/chevron-right.svg') center / 14px no-repeat;
-  }
-
   /* CTAs: small 8px-radius buttons, 34px tall, 8px apart */
-  header .nav-cta-list {
+  header .nav .nav-cta-list {
     flex-direction: row;
     align-items: center;
     gap: 0;
     margin-top: 0;
+    padding: 0;
+    border-top: 0;
   }
 
   header .nav-cta {
     display: inline-flex;
     align-items: center;
-    margin-right: 8px;
+    box-sizing: content-box;
+    justify-content: normal;
+    margin: 0 8px 0 0;
     padding: 4px 8px;
     border: 1px solid var(--bnp-green);
     border-radius: 8px;
@@ -712,30 +968,9 @@ header .nav-icon-search { --icon: url('../../icons/search-bnp.svg'); }
     line-height: 24px;
   }
 
-  header .nav a.nav-cta-outline {
-    border-color: var(--bnp-green);
-    background: #fff;
-    color: var(--bnp-green-text);
-  }
-
-  header .nav a.nav-cta-outline:hover {
-    background: rgb(210 238 227);
-    color: rgb(0 74 46);
-  }
-
+  header .nav a.nav-cta-outline,
   header .nav a.nav-cta-primary {
-    border-color: var(--bnp-green-text);
-    background: var(--bnp-green-text);
-  }
-
-  header .nav a.nav-cta-primary:hover {
-    border-color: rgb(0 99 62);
-    background: var(--bnp-green-hover);
-  }
-
-  header .nav-cta .nav-icon {
-    margin-right: 8px;
-    font-size: 20px;
+    height: auto;
   }
 }
 
