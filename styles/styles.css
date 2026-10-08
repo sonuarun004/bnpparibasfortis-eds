@@ -322,6 +322,11 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
+/* an authored section with no content would still add 80px of padding */
+main > .section:empty {
+  display: none;
+}
+
 @media (width >= 768px) {
   main > .section > div {
     max-width: 704px;
