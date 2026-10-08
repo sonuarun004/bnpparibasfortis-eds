@@ -31,3 +31,121 @@
     order: unset;
   }
 }
+
+/* ---- image + text rows (source: rich-text section) ----
+   Mobile: stacked, image first, no decoration. From 768px the image gets a
+   40px top margin and a grey panel offset 40px up and away from the text;
+   from 1024px the row is two equal columns with the text centred at 66%. */
+.columns.columns-media {
+  margin-bottom: 64px;
+  padding: 0 22px;
+}
+
+.columns.columns-media > div {
+  gap: 0;
+}
+
+.columns.columns-media .columns-img-col {
+  order: -1;
+  margin-bottom: 16px;
+  line-height: 0;
+}
+
+.columns.columns-media .columns-img-col picture {
+  display: block;
+}
+
+.columns.columns-media .columns-img-col img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.columns.columns-media h2 {
+  margin: 0 0 24px;
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  color: var(--text-color);
+}
+
+.columns.columns-media p {
+  margin: 0 0 24px;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@media (width >= 768px) {
+  .columns.columns-media {
+    padding: 0 12px;
+  }
+
+  /* still stacked (in content order) until 1024px */
+  .columns.columns-media > div {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .columns.columns-media > div > div {
+    flex: none;
+    order: 0;
+  }
+
+  .columns.columns-media .columns-img-col {
+    order: 0;
+    margin: 40px 0 16px;
+    border-radius: 8px;
+    box-shadow: 40px -40px 0 rgb(246 246 246);
+  }
+
+  .columns.columns-media .columns-img-right .columns-img-col {
+    box-shadow: -40px -40px 0 rgb(246 246 246);
+  }
+}
+
+@media (width >= 1024px) {
+  .columns.columns-media {
+    padding: 0;
+  }
+
+  .columns.columns-media > div {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* two equal halves; the image sits inside a 12px gutter so the grey
+     panel (box-shadow) hugs the image itself */
+  .columns.columns-media > div > div {
+    box-sizing: border-box;
+    flex: 0 0 50%;
+    min-width: 0;
+    padding: 0 12px;
+  }
+
+  .columns.columns-media .columns-img-col,
+  .columns.columns-media .columns-img-right .columns-img-col {
+    flex-basis: calc(50% - 24px);
+    margin-bottom: 0;
+    margin-inline: 12px;
+    padding: 0;
+  }
+
+  .columns.columns-media > div > div:not(.columns-img-col) > * {
+    width: 66%;
+    margin-inline: auto;
+  }
+}
+
+@media (width >= 1280px) {
+  .columns.columns-media {
+    margin-bottom: 96px;
+  }
+
+  .columns.columns-media h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
