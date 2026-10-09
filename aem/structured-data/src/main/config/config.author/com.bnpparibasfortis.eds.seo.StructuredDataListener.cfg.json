@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "contentRoot": "/content/bnpparibasfortis/be",
+  "siteOrigin": "https://www.bnpparibasfortis.be",
+  "country": "BE",
+  "timeZone": "Europe/Brussels",
+  "faqBlock": "accordion-faq"
+}

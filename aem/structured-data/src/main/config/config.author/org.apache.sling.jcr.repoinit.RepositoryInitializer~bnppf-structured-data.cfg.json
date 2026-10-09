@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create service user bnppf-structured-data with path system/bnpparibasfortis\nset ACL for bnppf-structured-data\n  allow jcr:read,rep:write on /content/bnpparibasfortis\nend"
+  ]
+}
