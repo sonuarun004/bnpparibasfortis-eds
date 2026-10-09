@@ -1,0 +1,5 @@
+{
+  "user.mapping": [
+    "REPLACE_WITH_CORE_BUNDLE_SYMBOLIC_NAME:structured-data=[bnppf-structured-data]"
+  ]
+}

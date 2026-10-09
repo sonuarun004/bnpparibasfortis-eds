@@ -13,3 +13,6 @@ helix-importer-ui
 !AGENTS.md
 migration-work/navigation-validation/
 migration-work/footer-validation/
+
+# AEM (Java) build output
+aem/*/target/
