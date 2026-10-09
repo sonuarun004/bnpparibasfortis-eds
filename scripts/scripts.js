@@ -282,7 +282,11 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  if (!fragmentPage) loadFooter(doc.querySelector('footer'));
+  if (!fragmentPage) {
+    loadFooter(doc.querySelector('footer'));
+    import('./structured-data.js')
+      .then(({ default: addStructuredData }) => addStructuredData(getLocale().language));
+  }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
