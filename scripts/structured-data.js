@@ -1,10 +1,9 @@
 /*
- * schema.org structured data, as on bnpparibasfortis.be.
- * - The bank (BankOrCreditUnion) is in head.html, so it is in every page's HTML.
- * - Authors can add page data via the JSON-LD page property, which is also
- *   rendered into the HTML.
- * - Anything a page doesn't provide that way is filled in here after load:
- *   the WebPage, and FAQPage data from FAQ blocks (see blocks/accordion-faq).
+ * schema.org structured data, as on bnpparibasfortis.be, built from what is
+ * authored in AEM. A property is only included when its authored value exists.
+ * - The bank (BankOrCreditUnion) is global, in head.html.
+ * - WebPage: from the page properties AEM delivers with every page.
+ * - FAQPage: from the page's FAQ blocks (see blocks/accordion-faq).
  */
 
 import { getMetadata } from './aem.js';
@@ -15,8 +14,8 @@ const JSON_LD_ID = 'page-structured-data';
 const GENERATED = ['page-structured-data', 'faq-structured-data'];
 
 /**
- * Whether the page HTML already has structured data of a schema.org type,
- * e.g. from the JSON-LD page property.
+ * Whether the page HTML already has structured data of a schema.org type
+ * (e.g. added through bulk metadata), so it isn't added twice.
  * @param {string} type e.g. 'FAQPage'
  * @returns {boolean}
  */
@@ -35,24 +34,33 @@ export function hasStructuredData(type) {
 }
 
 /**
- * Add WebPage structured data, unless the page HTML already has it. Uses the
- * source site's WebPage properties; its publish dates are only known to the
- * author, so they come with the JSON-LD page property.
+ * WebPage properties and the authored value each one comes from.
+ * @param {string} language the page's language code, e.g. 'nl'
+ * @returns {Object<string, string>}
+ */
+function webPageProperties(language) {
+  return {
+    name: getMetadata('og:title') || document.title,
+    description: getMetadata('description'),
+    url: document.querySelector('link[rel="canonical"]')?.href,
+    datePublished: getMetadata('published-time'),
+    dateModified: getMetadata('modified-time'),
+    inLanguage: language && `${language}-BE`,
+  };
+}
+
+/**
+ * Add the page's WebPage structured data, with only the properties whose
+ * authored value exists.
  * @param {string} language the page's language code, e.g. 'nl'
  */
 export default function addStructuredData(language) {
   if (hasStructuredData('WebPage')) return;
-  const url = document.querySelector('link[rel="canonical"]')?.href
-    || window.location.href.split('#')[0];
-  const page = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: getMetadata('og:title') || document.title,
-  };
-  const description = getMetadata('description');
-  if (description) page.description = description;
-  page.url = url;
-  page.inLanguage = `${language}-BE`;
+  const page = { '@context': 'https://schema.org', '@type': 'WebPage' };
+  Object.entries(webPageProperties(language)).forEach(([property, value]) => {
+    if (value) page[property] = value;
+  });
+  if (!page.name) return;
 
   document.getElementById(JSON_LD_ID)?.remove();
   const script = document.createElement('script');

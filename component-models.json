@@ -20,13 +20,6 @@
         "name": "keywords",
         "multi": true,
         "label": "Keywords"
-      },
-      {
-        "component": "textarea",
-        "valueType": "string",
-        "name": "json-ld",
-        "label": "JSON-LD",
-        "description": "Structured data (schema.org) for this page, as one JSON object. Rendered into the page HTML."
       }
     ]
   },
