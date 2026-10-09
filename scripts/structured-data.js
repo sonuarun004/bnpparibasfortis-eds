@@ -1,68 +1,63 @@
 /*
- * schema.org structured data for every page, as on bnpparibasfortis.be:
- * the bank (organization) and the page itself (WebPage). FAQ blocks add
- * their own FAQPage data (see blocks/accordion-faq).
+ * schema.org structured data, as on bnpparibasfortis.be.
+ * - The bank (BankOrCreditUnion) is in head.html, so it is in every page's HTML.
+ * - Authors can add page data via the JSON-LD page property, which is also
+ *   rendered into the HTML.
+ * - Anything a page doesn't provide that way is filled in here after load:
+ *   the WebPage, and FAQPage data from FAQ blocks (see blocks/accordion-faq).
  */
 
 import { getMetadata } from './aem.js';
 
 const JSON_LD_ID = 'page-structured-data';
 
+// scripts this module and the FAQ block generate (not part of the page HTML)
+const GENERATED = ['page-structured-data', 'faq-structured-data'];
+
 /**
- * The bank, as described on the source site.
- * @param {string} origin
- * @returns {object}
+ * Whether the page HTML already has structured data of a schema.org type,
+ * e.g. from the JSON-LD page property.
+ * @param {string} type e.g. 'FAQPage'
+ * @returns {boolean}
  */
-function organization(origin) {
-  return {
-    '@type': 'BankOrCreditUnion',
-    '@id': `${origin}/#organization`,
-    name: 'BNP Paribas Fortis',
-    alternateName: ['BNPPF', 'Fortis'],
-    url: origin,
-    logo: {
-      '@type': 'ImageObject',
-      url: `${origin}/icons/bnppf-logo-mark.svg`,
-    },
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Montagne du Parc 3',
-      addressLocality: 'Bruxelles',
-      postalCode: '1000',
-      addressCountry: 'BE',
-    },
-    sameAs: [
-      'https://www.linkedin.com/company/bnpparibasfortis',
-      'https://www.youtube.com/user/bnppfbelgique',
-    ],
-  };
+export function hasStructuredData(type) {
+  return [...document.querySelectorAll('script[type="application/ld+json"]')]
+    .filter((script) => !GENERATED.includes(script.id))
+    .some((script) => {
+      try {
+        const data = JSON.parse(script.textContent);
+        const items = [data, ...(data['@graph'] || [])];
+        return items.some((item) => [].concat(item['@type']).includes(type));
+      } catch (e) {
+        return false;
+      }
+    });
 }
 
 /**
- * Add the organization and WebPage structured data to the document head.
+ * Add WebPage structured data, unless the page HTML already has it. Uses the
+ * source site's WebPage properties; its publish dates are only known to the
+ * author, so they come with the JSON-LD page property.
  * @param {string} language the page's language code, e.g. 'nl'
  */
 export default function addStructuredData(language) {
-  const { origin } = window.location;
-  const canonical = document.querySelector('link[rel="canonical"]')?.href;
+  if (hasStructuredData('WebPage')) return;
+  const url = document.querySelector('link[rel="canonical"]')?.href
+    || window.location.href.split('#')[0];
   const page = {
+    '@context': 'https://schema.org',
     '@type': 'WebPage',
-    '@id': `${canonical || window.location.href.split('#')[0]}#webpage`,
     name: getMetadata('og:title') || document.title,
-    url: canonical || window.location.href.split('#')[0],
-    inLanguage: `${language}-BE`,
-    publisher: { '@id': `${origin}/#organization` },
   };
   const description = getMetadata('description');
   if (description) page.description = description;
+  page.url = url;
+  page.inLanguage = `${language}-BE`;
 
   document.getElementById(JSON_LD_ID)?.remove();
   const script = document.createElement('script');
   script.type = 'application/ld+json';
   script.id = JSON_LD_ID;
-  script.textContent = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@graph': [organization(origin), page],
-  });
+  script.textContent = JSON.stringify(page);
   document.head.append(script);
 }

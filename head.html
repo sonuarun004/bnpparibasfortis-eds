@@ -7,3 +7,37 @@
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
 <link rel="stylesheet" href="/styles/styles.css"/>
+<script type="application/ld+json" id="organization-structured-data">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BankOrCreditUnion",
+      "@id": "https://www.bnpparibasfortis.be/#organization",
+      "name": "BNP Paribas Fortis",
+      "alternateName": [
+        "BNPPF",
+        "Fortis"
+      ],
+      "url": "https://www.bnpparibasfortis.be",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.bnpparibasfortis.be/icons/bnppf-logo-180.png",
+        "width": 180,
+        "height": 180
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Montagne du Parc 3",
+        "addressLocality": "Bruxelles",
+        "postalCode": "1000",
+        "addressCountry": "BE"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/bnpparibasfortis",
+        "https://www.youtube.com/user/bnppfbelgique"
+      ]
+    }
+  ]
+}
+</script>
