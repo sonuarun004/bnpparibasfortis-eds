@@ -12,7 +12,7 @@ const JSON_LD_ID = 'faq-structured-data';
 /**
  * Add (or refresh) schema.org FAQPage structured data for every FAQ item on
  * the page, so search engines can show the questions as rich results.
- * Skipped when the page HTML already has FAQPage data (JSON-LD page property).
+ * Skipped when the page HTML already has FAQPage data.
  * Re-running (e.g. while editing in Universal Editor) replaces the data.
  */
 function updateStructuredData() {
