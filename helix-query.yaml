@@ -7,6 +7,11 @@ indices:
     exclude:
       - '/**.json'
       - '/language-masters/**'
+      # nav and footer are fragments loaded into every page, not pages
+      - '/**/nav'
+      - '/**/footer'
+      - '/nav'
+      - '/footer'
     target: /query-index.json
     properties:
       lastModified:
