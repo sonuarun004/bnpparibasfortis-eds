@@ -1,8 +1,9 @@
 /*
- * schema.org structured data, as on bnpparibasfortis.be, built from what is
- * authored in AEM. A property is only included when its authored value exists.
+ * schema.org structured data, as on bnpparibasfortis.be, built in the browser
+ * from the page's own HTML (the metadata AEM renders from the page properties).
+ * A property is only included when its value exists in the page.
  * - The bank (BankOrCreditUnion) is global, in head.html.
- * - WebPage: from the page properties AEM delivers with every page.
+ * - WebPage: from the page's <meta>, <link rel="canonical"> and <html lang>.
  * - FAQPage: from the page's FAQ blocks (see blocks/accordion-faq).
  */
 
@@ -34,30 +35,29 @@ export function hasStructuredData(type) {
 }
 
 /**
- * WebPage properties and the authored value each one comes from.
- * @param {string} language the page's language code, e.g. 'nl'
+ * WebPage properties and the page HTML each one is read from.
  * @returns {Object<string, string>}
  */
-function webPageProperties(language) {
+function webPageProperties() {
+  const { lang } = document.documentElement;
   return {
     name: getMetadata('og:title') || document.title,
     description: getMetadata('description'),
     url: document.querySelector('link[rel="canonical"]')?.href,
     datePublished: getMetadata('published-time'),
     dateModified: getMetadata('modified-time'),
-    inLanguage: language && `${language}-BE`,
+    inLanguage: lang && `${lang}-BE`,
   };
 }
 
 /**
  * Add the page's WebPage structured data, with only the properties whose
- * authored value exists.
- * @param {string} language the page's language code, e.g. 'nl'
+ * value exists in the page.
  */
-export default function addStructuredData(language) {
+export default function addStructuredData() {
   if (hasStructuredData('WebPage')) return;
   const page = { '@context': 'https://schema.org', '@type': 'WebPage' };
-  Object.entries(webPageProperties(language)).forEach(([property, value]) => {
+  Object.entries(webPageProperties()).forEach(([property, value]) => {
     if (value) page[property] = value;
   });
   if (!page.name) return;
