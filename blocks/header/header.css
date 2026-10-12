@@ -5,11 +5,8 @@
 
 /* stylelint-disable no-descending-specificity */
 
-/* the boilerplate sets a fixed header height; this header is content-sized */
-header.header-wrapper,
-header {
-  height: auto;
-}
+/* the header keeps the height reserved in styles.css (--nav-height): it
+   matches the rendered header, so nothing shifts when the nav loads */
 
 /* the header stays at the top of the screen, as on the source */
 header {

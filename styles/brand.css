@@ -22,7 +22,10 @@
   /* Spacing */
   --section-padding: 40px;
   --content-max-width: 1200px;
-  --nav-height: 64px;
+
+  /* reserved before the header loads, so the page doesn't shift: the compact
+     header is 66px; from 1024px the two-row header is 138px */
+  --nav-height: 66px;
 
   /* Heading sizes (desktop) */
   --heading-size-xxl: 32px;
@@ -31,4 +34,10 @@
   --heading-size-m: 16px;
   --heading-size-s: 15px;
   --heading-size-xs: 14px;
+}
+
+@media (width >= 1024px) {
+  :root {
+    --nav-height: 138px;
+  }
 }
