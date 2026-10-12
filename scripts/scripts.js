@@ -285,7 +285,7 @@ async function loadLazy(doc) {
   if (!fragmentPage) {
     loadFooter(doc.querySelector('footer'));
     import('./structured-data.js')
-      .then(({ default: addStructuredData }) => addStructuredData(getLocale().language));
+      .then(({ default: addStructuredData }) => addStructuredData());
   }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
