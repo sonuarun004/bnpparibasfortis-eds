@@ -313,27 +313,33 @@ function partsFromFragment(sections) {
     .flatMap((s) => [...s.querySelectorAll(':scope > ul')])
     .find(isSocialList) || null;
 
-  const legalSection = sections[1];
-  let emergency = [];
+  // The other parts are recognised by their content, not by which section
+  // they are in, so authors may put e.g. Fraud Stop in a section of its own:
+  // - images and paragraphs of sections with a tel: link: emergency numbers
+  // - the first non-social list: legal links
+  // - the © paragraph, and the text of sections without a phone number:
+  //   copyright
+  const emergencyEls = [];
   let legalLinks = null;
-  if (legalSection) {
-    emergency = emergencyItems([...legalSection.children].filter((el) => el.tagName === 'P'));
-    const ul = [...legalSection.querySelectorAll(':scope > ul')].find((u) => u !== socialLinks);
-    if (ul) legalLinks = ul.cloneNode(true);
-  }
-
-  const copyrightSection = sections[2];
-  let copyright = null;
-  if (copyrightSection) {
-    const wrap = document.createElement('div');
-    [...copyrightSection.children].forEach((el) => {
+  const copyrightWrap = document.createElement('div');
+  sections.slice(1).forEach((section) => {
+    const hasTel = !!section.querySelector('a[href^="tel:"]');
+    [...section.children].forEach((el) => {
       if (el === socialLinks) return;
-      if (!(el.tagName === 'P' && el.querySelector('img') && !el.textContent.trim())) {
-        wrap.append(el.cloneNode(true));
+      if (el.tagName === 'UL') {
+        if (!legalLinks) legalLinks = el.cloneNode(true);
+        return;
       }
+      if (el.tagName !== 'P') return;
+      const text = el.textContent.trim();
+      const imageOnly = el.querySelector('img') && !text;
+      if (text.includes('©')) copyrightWrap.append(el.cloneNode(true));
+      else if (hasTel || imageOnly) emergencyEls.push(el);
+      else if (text) copyrightWrap.append(el.cloneNode(true));
     });
-    if (wrap.childElementCount) copyright = wrap;
-  }
+  });
+  const emergency = emergencyItems(emergencyEls);
+  const copyright = copyrightWrap.childElementCount ? copyrightWrap : null;
 
   return {
     columns, emergency, legalLinks, socialLinks, copyright,
