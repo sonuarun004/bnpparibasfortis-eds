@@ -25,9 +25,14 @@ function buildIcon(name) {
   return icon;
 }
 
+// "About us" is a corporate section, not a customer segment: as on the source
+// site, its pages keep the default segment (the first audience) highlighted
+const ABOUT_US = /\/(over-ons|a-propos-de-nous|about-us)$/;
+
 /**
- * Mark the audience link for the current section as active. Pages outside
- * every audience (e.g. "over ons" content) fall back to the first audience,
+ * Mark the audience link for the current section as active, e.g.
+ * Professionals on /nl/ondernemers/... pages. Pages outside every customer
+ * segment (including the "about us" pages) fall back to the first audience,
  * as on the source site.
  * @param {Element} list The audience <ul>
  */
@@ -37,7 +42,7 @@ function markActiveAudience(list) {
   const path = window.location.pathname;
   const active = links.find((a) => {
     const href = new URL(a.href, window.location.href).pathname.replace(/\/$/, '');
-    return href && path.startsWith(href);
+    return href && !ABOUT_US.test(href) && (path === href || path.startsWith(`${href}/`));
   }) || links[0];
   active.classList.add('active');
   active.setAttribute('aria-current', 'page');
