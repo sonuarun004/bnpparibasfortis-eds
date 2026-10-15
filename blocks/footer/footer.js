@@ -4,8 +4,8 @@
 //      by AEM is decorated in place (author-editable in UE).
 //   2. As a content-first FRAGMENT — when no block is present, the flat
 //      `footer.plain.html` fragment is fetched and decorated (legacy path).
-// Brand imagery (Card Stop icon, logo) is served from the code repo /icons/
-// so it survives publishing and needs no authoring.
+// The emergency numbers (Card Stop, Fraud Stop, ...) use the images authored
+// with them (from the DAM); the repo Card Stop icon is only a fallback.
 
 import { fetchLocaleFragment, localizeSourceLinks } from '../../scripts/scripts.js';
 
@@ -36,17 +36,59 @@ function fragmentSections(doc) {
 }
 
 /**
- * Build the Card Stop icon element (from the repo asset).
- * @returns {Element}
+ * Build an emergency item's image: the authored image, or (for the first
+ * item, Card Stop) the repo icon when none was authored or it didn't load.
+ * @param {Element|null} image authored <img>
+ * @param {boolean} fallback use the repo Card Stop icon if there's no image
+ * @returns {Element|null}
  */
-function buildCardstopIcon() {
+function buildEmergencyIcon(image, fallback) {
+  const src = image && image.getAttribute('src');
+  if (!src || src.startsWith('about:')) {
+    if (!fallback) return null;
+    const icon = document.createElement('img');
+    icon.src = CARDSTOP_ICON;
+    icon.alt = 'Card Stop';
+    icon.className = 'footer-cardstop-icon';
+    icon.width = 66;
+    icon.height = 65;
+    return icon;
+  }
   const icon = document.createElement('img');
-  icon.src = CARDSTOP_ICON;
-  icon.alt = 'Card Stop';
+  icon.src = src;
+  icon.alt = image.getAttribute('alt') || '';
   icon.className = 'footer-cardstop-icon';
-  icon.width = 66;
-  icon.height = 65;
+  icon.loading = 'lazy';
   return icon;
+}
+
+/**
+ * Split the emergency area into items. An image paragraph starts a new item;
+ * the text paragraphs after it (label + tel: link) belong to it. A second
+ * tel: paragraph without its own image also starts a new item.
+ * @param {Element[]} elements the area's paragraphs, in order
+ * @returns {Array<{image: Element|null, text: Element}>}
+ */
+function emergencyItems(elements) {
+  const items = [];
+  let current = null;
+  elements.forEach((el) => {
+    const img = el.querySelector('img');
+    const imageOnly = img && !el.textContent.trim();
+    if (imageOnly) {
+      current = { image: img, text: document.createElement('div') };
+      items.push(current);
+      return;
+    }
+    if (el.tagName !== 'P' || !el.textContent.trim()) return;
+    const hasTel = el.querySelector('a[href^="tel:"]');
+    if (!current || (hasTel && current.text.querySelector('a[href^="tel:"]'))) {
+      current = { image: null, text: document.createElement('div') };
+      items.push(current);
+    }
+    current.text.append(el.cloneNode(true));
+  });
+  return items.filter((item) => item.text.childElementCount);
 }
 
 /**
@@ -136,14 +178,15 @@ function buildSocial(ul) {
  * Assemble the footer inner regions from already-extracted parts.
  * @param {object} parts
  * @param {Array<{heading: string, links: Element|null}>} parts.columns
- * @param {Element|null} parts.cardstopText  paragraph(s) wrapper for label+phone
+ * @param {Array<{image: Element|null, text: Element}>} parts.emergency
+ *   emergency numbers (Card Stop, Fraud Stop, ...): image + label/phone
  * @param {Element|null} parts.legalLinks    <ul> of legal links
  * @param {Element|null} parts.socialLinks   <ul> of social network links
  * @param {Element|null} parts.copyright     copyright content wrapper
  * @returns {Element[]} the main footer area and the copyright band
  */
 function buildFooterInner({
-  columns, cardstopText, legalLinks, socialLinks, copyright,
+  columns, emergency, legalLinks, socialLinks, copyright,
 }) {
   const inner = document.createElement('div');
   inner.className = 'footer-inner';
@@ -178,22 +221,26 @@ function buildFooterInner({
     inner.append(region);
   }
 
-  // Region 2: legal band (cardstop icon + text + legal links)
-  if (cardstopText || legalLinks) {
+  // Region 2: legal band (emergency numbers + legal links)
+  if (emergency.length || legalLinks) {
     const region = document.createElement('div');
     region.className = 'footer-legal';
 
-    const cardstop = document.createElement('div');
-    cardstop.className = 'footer-cardstop';
-    cardstop.append(buildCardstopIcon());
-    if (cardstopText) {
+    const numbers = document.createElement('div');
+    numbers.className = 'footer-emergency';
+    emergency.forEach(({ image, text }, i) => {
+      const item = document.createElement('div');
+      item.className = 'footer-cardstop';
+      const icon = buildEmergencyIcon(image, i === 0);
+      if (icon) item.append(icon);
       const textWrap = document.createElement('div');
       textWrap.className = 'footer-cardstop-text';
-      textWrap.append(cardstopText);
-      cardstop.append(textWrap);
-      const btn = buildCardstopButton(cardstopText);
-      if (btn) cardstop.append(btn);
-    }
+      textWrap.append(text);
+      item.append(textWrap);
+      const btn = buildCardstopButton(text);
+      if (btn) item.append(btn);
+      numbers.append(item);
+    });
 
     const linksWrap = document.createElement('div');
     linksWrap.className = 'footer-legal-links';
@@ -203,7 +250,7 @@ function buildFooterInner({
       linksWrap.append(legalLinks);
     }
 
-    region.append(cardstop, linksWrap);
+    region.append(numbers, linksWrap);
     inner.append(region);
   }
 
@@ -267,16 +314,10 @@ function partsFromFragment(sections) {
     .find(isSocialList) || null;
 
   const legalSection = sections[1];
-  let cardstopText = null;
+  let emergency = [];
   let legalLinks = null;
   if (legalSection) {
-    const textWrap = document.createElement('div');
-    [...legalSection.children].forEach((el) => {
-      if (el.tagName === 'P' && !(el.querySelector('img') && !el.textContent.trim())) {
-        textWrap.append(el.cloneNode(true));
-      }
-    });
-    if (textWrap.childElementCount) cardstopText = textWrap;
+    emergency = emergencyItems([...legalSection.children].filter((el) => el.tagName === 'P'));
     const ul = [...legalSection.querySelectorAll(':scope > ul')].find((u) => u !== socialLinks);
     if (ul) legalLinks = ul.cloneNode(true);
   }
@@ -295,7 +336,7 @@ function partsFromFragment(sections) {
   }
 
   return {
-    columns, cardstopText, legalLinks, socialLinks, copyright,
+    columns, emergency, legalLinks, socialLinks, copyright,
   };
 }
 
@@ -309,7 +350,7 @@ function partsFromFragment(sections) {
  */
 function partsFromBlock(block) {
   const columns = [];
-  let cardstopText = null;
+  let emergency = [];
   let legalLinks = null;
   let socialLinks = null;
   let copyright = null;
@@ -330,10 +371,8 @@ function partsFromBlock(block) {
     const text = cell.textContent.trim();
 
     if (hasTel) {
-      // Card Stop label + phone.
-      const wrap = document.createElement('div');
-      [...cell.children].forEach((el) => wrap.append(el.cloneNode(true)));
-      cardstopText = wrap;
+      // Emergency numbers: image(s) + label + phone.
+      emergency = emergencyItems([...cell.children]);
     } else if (ul && isSocialList(ul)) {
       // Social network links.
       socialLinks = ul;
@@ -349,7 +388,7 @@ function partsFromBlock(block) {
   });
 
   return {
-    columns, cardstopText, legalLinks, socialLinks, copyright,
+    columns, emergency, legalLinks, socialLinks, copyright,
   };
 }
 

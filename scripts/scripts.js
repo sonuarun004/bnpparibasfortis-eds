@@ -151,7 +151,18 @@ export async function fetchLocaleFragment(name) {
   }
   const resp = await fetchFirst([...new Set(urls)]);
   if (!resp) return null;
-  return new DOMParser().parseFromString(await resp.text(), 'text/html');
+  const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
+  // authored images are relative to the fragment (./media_...); make them
+  // absolute so they still load when the fragment is shown on another page
+  const base = new URL(resp.url || urls[0], window.location.href);
+  doc.querySelectorAll('img[src], source[srcset]').forEach((el) => {
+    const attr = el.tagName === 'IMG' ? 'src' : 'srcset';
+    const value = el.getAttribute(attr);
+    if (!value.startsWith('./')) return;
+    const url = new URL(value, base);
+    el.setAttribute(attr, `${url.pathname}${url.search}`);
+  });
+  return doc;
 }
 
 /**
