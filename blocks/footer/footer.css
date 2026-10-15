@@ -111,7 +111,7 @@ footer .footer-col-links a {
   line-height: 24px;
 }
 
-/* ---- legal band: Card Stop + legal links ---- */
+/* ---- legal band: emergency numbers (Card Stop, Fraud Stop, ...) + legal links ---- */
 footer .footer-legal {
   padding: 0 8px 40px;
   text-align: center;
@@ -123,9 +123,16 @@ footer .footer-cardstop {
   padding-bottom: 16px;
 }
 
+footer .footer-cardstop + .footer-cardstop {
+  margin-top: 24px;
+}
+
+/* authored images differ in shape (Card Stop is square, Fraud Stop wide):
+   all are 65px high, at most 120px wide */
 footer .footer-cardstop-icon {
   display: inline-block;
-  width: 66px;
+  width: auto;
+  max-width: 120px;
   height: 65px;
   margin-bottom: 24px;
   object-fit: contain;
@@ -149,6 +156,11 @@ footer .footer-cardstop-text a:hover {
   font-family: var(--heading-font-family);
   color: rgb(233 62 46);
   white-space: nowrap;
+}
+
+/* the phone number sits on its own line under the label */
+footer .footer-cardstop-text a[href^="tel:"] {
+  display: block;
 }
 
 /* mobile call button: the source's red (nearest AA shade for white text) */
@@ -320,7 +332,7 @@ footer .footer-copyright-text p {
     --footer-width: 960px;
   }
 
-  /* two halves: Card Stop (max 480px, centred) | legal links */
+  /* two halves: emergency numbers | legal links */
   footer .footer-legal {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -335,7 +347,7 @@ footer .footer-copyright-text p {
     display: flex;
     align-items: flex-start;
     width: calc(100% - 24px);
-    max-width: 480px;
+    max-width: none;
     padding: 0 0 16px;
   }
 
@@ -343,10 +355,23 @@ footer .footer-copyright-text p {
     padding: 0 12px;
   }
 
-  /* the icon sits at the start of a 25% column; text follows after 16px */
+  /* with several emergency numbers the left side is taller: one column of
+     legal links */
+  footer .footer-legal:has(.footer-cardstop + .footer-cardstop) .footer-legal-links ul {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
+
+  /* each image is centred in a 25% column, so items line up; text follows
+     after 16px */
   footer .footer-cardstop-icon {
-    flex: 0 0 auto;
-    margin: 0 calc(25% - 66px) 0 0;
+    box-sizing: border-box;
+    flex: 0 0 25%;
+    width: 25%;
+    max-width: none;
+    margin: 0;
+    object-position: center top;
   }
 
   footer .footer-cardstop-text {
