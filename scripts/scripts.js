@@ -52,16 +52,20 @@ export const LANGUAGES = ['nl', 'fr', 'en'];
  * Work out the current locale from the URL. The language is the first of the
  * leading path segments that is a supported language code, so this works in
  * every environment:
- *   /nl/over-ons/...            country site (BE root mapped to the domain)
- *   /be/nl/over-ons/...         brand-level site
- *   /content/be/nl/over-ons/... local dev server
+ *   /nl/over-ons/...                                         Edge Delivery
+ *   /be/nl/over-ons/...                                      brand-level site
+ *   /content/be/nl/over-ons/...                              local dev server
+ *   /content/bnpparibasfortis/be/nl/over-ons/...html         AEM author (country site)
+ *   /content/bnpparibasfortis/language-masters/nl/...html    AEM author (language master)
+ * On AEM author the nav/footer are then the ones of the page's own language
+ * root, e.g. language-masters/nl/footer for a language-master page.
  * @param {string} [pathname]
  * @returns {{language: string, base: string, rest: string, matched: boolean}}
  *   base: path before the language segment; rest: path after it
  */
 export function getLocale(pathname = window.location.pathname) {
   const segments = pathname.split('/');
-  const index = segments.findIndex((s, i) => i > 0 && i <= 3 && LANGUAGES.includes(s));
+  const index = segments.findIndex((s, i) => i > 0 && i <= 4 && LANGUAGES.includes(s));
   if (index === -1) {
     return {
       language: LANGUAGES[0], base: '', rest: '/', matched: false,
